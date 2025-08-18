@@ -1,0 +1,19 @@
+{
+    "metadata": {
+        "optimization_method": "differential_evolution",
+        "objective_type": "pearson_correlation_coefficient",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 0.35347499294890405
+    },
+    "params": [
+        147.35677658625764,
+        2.1861151943817885,
+        444.5881784649828,
+        0.3914119246419441,
+        293.8952476784243,
+        0.7835657034075627,
+        444.36009111390376,
+        0.983922736778557
+    ]
+}

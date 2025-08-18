@@ -41,9 +41,8 @@ def plot_frequency_domain_signal(fft_freqs, fft_magnitude, target_freqs, target_
     else:
         target_amps_normalized = target_amps
 
-    # Plot only the positive frequencies using the NORMALIZED data
-    positive_mask = fft_freqs >= 0
-    plt.plot(fft_freqs[positive_mask], fft_magnitude_normalized[positive_mask], label='Optimized Spectrum (Normalized)')
+    # Plot using the positive-frequency rFFT arrays provided
+    plt.plot(fft_freqs, fft_magnitude_normalized, label='Optimized Spectrum (Normalized)')
     plt.scatter(target_freqs, target_amps_normalized, color='red', label='Target Partials (Normalized)', zorder=5)
     
     plt.title('Frequency Spectrum Comparison')

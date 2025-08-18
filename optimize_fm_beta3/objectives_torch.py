@@ -81,6 +81,63 @@ def itakura_saito_dist_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor) 
     return is_distance
 
 
+def build_target_spectrum_torch(
+    frequencies: torch.Tensor,
+    amplitudes: torch.Tensor,
+    sample_rate: int,
+    duration: float,
+    mode: str = 'sparse',
+    gaussian_sigma_hz: float = 30.0,
+    fft_zero_pad: bool = True,
+    fft_window: str = 'hann',
+):
+    """
+    Build a target spectrum vector on positive frequencies, similar to NumPy path, but in Torch.
+    Useful when doing fully-in-Torch objectives.
+    """
+    n_base = int(sample_rate * duration)
+    if fft_zero_pad:
+        n_pad = 1 << (n_base - 1).bit_length()
+    else:
+        n_pad = n_base
+    # Frequency axis for rFFT
+    freqs = torch.fft.rfftfreq(n_pad, d=1.0 / sample_rate)
+
+    # Normalize amplitudes to [0,1]
+    amp_max = torch.max(amplitudes)
+    amps_norm = amplitudes / (amp_max + 1e-12)
+
+    if mode == 'sparse':
+        target_vec = torch.zeros_like(freqs)
+        # Assign to nearest bin
+        for f, a in zip(frequencies, amps_norm):
+            idx = torch.argmin(torch.abs(freqs - f))
+            target_vec[idx] = torch.maximum(target_vec[idx], a)
+        # Normalize
+        tmax = torch.max(target_vec)
+        if tmax > 0:
+            target_vec = target_vec / tmax
+        return target_vec
+
+    if mode == 'peaks_windowed':
+        target_vec = torch.zeros_like(freqs)
+        sigma = max(gaussian_sigma_hz, 1e-6)
+        for f, a in zip(frequencies, amps_norm):
+            gauss = torch.exp(-0.5 * ((freqs - f) / sigma) ** 2)
+            target_vec += a * gauss
+        tmax = torch.max(target_vec)
+        if tmax > 0:
+            target_vec = target_vec / tmax
+        return target_vec
+
+    if mode == 'full':
+        # Render additive target on-the-fly here would require a synth in torch.
+        # For now, recommend using NumPy path for 'full' or provide a torch signal externally.
+        raise NotImplementedError("'full' mode for torch target spectrum requires a torch-target signal.")
+
+    raise ValueError(f"Unknown mode: {mode}")
+
+
 # --- Dictionaries to map objective types to their PyTorch functions ---
 
 TORCH_METRIC_FUNCTIONS = {

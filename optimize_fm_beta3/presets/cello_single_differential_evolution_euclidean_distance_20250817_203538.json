@@ -1,0 +1,19 @@
+{
+    "metadata": {
+        "optimization_method": "differential_evolution",
+        "objective_type": "euclidean_distance",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 1.1634165267128482
+    },
+    "params": [
+        147.35977448326764,
+        11.57915230324629,
+        150.0728473414242,
+        0.1727692138239786,
+        4264.371910164972,
+        0.6388409543310838,
+        4407.941733952184,
+        1.842540716269268
+    ]
+}

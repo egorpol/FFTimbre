@@ -1,0 +1,19 @@
+{
+    "metadata": {
+        "optimization_method": "dual_annealing",
+        "objective_type": "itakura_saito",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 27385.711878611954
+    },
+    "params": [
+        482.2013471997243,
+        10.427689058793533,
+        87.1828172753631,
+        0.6552749427783089,
+        247.3444405990198,
+        0.06019171553256059,
+        37.3692179529555,
+        1.9133849594811478
+    ]
+}

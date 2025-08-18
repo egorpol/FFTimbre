@@ -1,0 +1,19 @@
+{
+    "metadata": {
+        "optimization_method": "differential_evolution",
+        "objective_type": "itakura_saito",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 27002.405913200753
+    },
+    "params": [
+        132.05537695962718,
+        4.938650444763969,
+        148.3691019519579,
+        1.1758189706848585,
+        37.096987569275925,
+        0.4539265979788893,
+        18.54505060622148,
+        3.4251699771238076
+    ]
+}
