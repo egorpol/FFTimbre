@@ -1,0 +1,19 @@
+{
+    "metadata": {
+        "optimization_method": "adam",
+        "objective_type": "cosine_similarity",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 0.9988150596618652
+    },
+    "params": [
+        4186.69091796875,
+        8.26058578491211,
+        3437.228515625,
+        12.0,
+        2325.706298828125,
+        0.0,
+        4984.11572265625,
+        9.648399353027344
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "metadata": {
+        "optimization_method": "differential_evolution",
+        "objective_type": "cosine_similarity",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 0.3137721185271882
+    },
+    "params": [
+        146.99796871294893,
+        10.150768286038966,
+        150.01658589094222,
+        0.4110524016852377,
+        293.9970004007282,
+        0.9112902520386159,
+        367.20965135592905,
+        0.44769509058732115
+    ]
+}
