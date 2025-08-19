@@ -2,7 +2,7 @@
 from tqdm.auto import tqdm
 from scipy.optimize import differential_evolution, dual_annealing, basinhopping
 from synthesis import synthesize_fm_chain
-from objectives import compute_mfcc, compute_fft, METRIC_FUNCTIONS, METRIC_TYPE
+from objectives import compute_mfcc, compute_fft, METRIC_FUNCTIONS, METRIC_TYPE, build_erb_filterbank, resolve_metric
 import numpy as np
 from types import SimpleNamespace # <-- Import this
 import cma # <-- Import this
@@ -14,11 +14,17 @@ def define_objective_function(
     duration,
     sample_rate,
     fft_zero_pad: bool = True,
-    fft_window: str = 'hann'
+    fft_window: str = 'hann',
+    erb_n_bands: int = 40,
+    erb_min_hz: float = 20.0,
+    erb_max_hz: float | None = None,
 ):
     """Creates a unified objective function for the optimizer."""
-    metric_func = METRIC_FUNCTIONS[objective_type]
-    feature_type = METRIC_TYPE[objective_type]
+    try:
+        metric_func, feature_type = resolve_metric(objective_type)
+    except Exception:
+        metric_func = METRIC_FUNCTIONS[objective_type]
+        feature_type = METRIC_TYPE[objective_type]
 
     def objective(params):
         # 1. Synthesize the signal
@@ -27,7 +33,7 @@ def define_objective_function(
         # 2. Extract the relevant feature
         if feature_type == 'mfcc':
             generated_feature = compute_mfcc(generated_signal, sample_rate)
-        elif feature_type == 'spectrum':
+        elif feature_type in ('spectrum', 'erb'):
             generated_feature, _ = compute_fft(
                 generated_signal,
                 sample_rate,
@@ -43,7 +49,20 @@ def define_objective_function(
         max_val = np.max(generated_feature)
         if max_val > 0:
             generated_feature /= max_val
-        # The target_data (for spectrum) is already a sparse [0,1] array, so they are now comparable.
+        # The target_data for spectrum/erb is expected to be normalized to [0,1].
+        # Project to ERB bands if requested
+        if feature_type == 'erb':
+            n_base = int(sample_rate * duration)
+            if fft_zero_pad:
+                n_pad = 1 << (n_base - 1).bit_length()
+            else:
+                n_pad = n_base
+            freqs = np.fft.rfftfreq(n_pad, 1.0 / sample_rate)
+            W = build_erb_filterbank(freqs, n_bands=erb_n_bands, min_hz=erb_min_hz, max_hz=erb_max_hz)
+            generated_feature = W @ generated_feature
+            m = np.max(generated_feature)
+            if m > 0:
+                generated_feature = generated_feature / m
         # --- END OF FIX ---
 
         # 4. Calculate and return the distance

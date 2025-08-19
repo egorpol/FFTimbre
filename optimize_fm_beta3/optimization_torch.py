@@ -4,7 +4,13 @@ from tqdm.auto import tqdm
 from types import SimpleNamespace
 
 from synthesis_torch import synthesize_fm_chain_torch
-from objectives_torch import TORCH_METRIC_FUNCTIONS, TORCH_METRIC_FEATURE_TYPE, compute_mfcc_torch
+from objectives_torch import (
+    TORCH_METRIC_FUNCTIONS,
+    TORCH_METRIC_FEATURE_TYPE,
+    compute_mfcc_torch,
+    resolve_metric_torch,
+    build_erb_filterbank_torch,
+)
 
 def run_adam_optimization(
     objective_type: str,
@@ -24,6 +30,9 @@ def run_adam_optimization(
     log_mag_scale: float = 1.0,
     grad_clip_norm: float = 1.0,
     use_adamw: bool = False,
+    erb_n_bands: int = 40,
+    erb_min_hz: float = 20.0,
+    erb_max_hz: float | None = None,
 ):
     """
     Performs gradient-based optimization using the Adam optimizer in PyTorch.
@@ -52,8 +61,11 @@ def run_adam_optimization(
     optimizer = OptimizerCls([raw_params], lr=learning_rate)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_iters)
     
-    metric_func = TORCH_METRIC_FUNCTIONS.get(objective_type)
-    feature_type = TORCH_METRIC_FEATURE_TYPE.get(objective_type)
+    try:
+        metric_func, feature_type = resolve_metric_torch(objective_type)
+    except Exception:
+        metric_func = TORCH_METRIC_FUNCTIONS.get(objective_type)
+        feature_type = TORCH_METRIC_FEATURE_TYPE.get(objective_type)
     if metric_func is None or feature_type is None:
         raise NotImplementedError(f"Objective type '{objective_type}' is not implemented for PyTorch.")
 
@@ -67,7 +79,7 @@ def run_adam_optimization(
         # All tensors generated from bounded_params will now be on the correct device
         generated_signal = synthesize_fm_chain_torch(bounded_params, duration, sample_rate)
 
-        if feature_type == 'spectrum':
+        if feature_type in ('spectrum', 'erb'):
             # Apply window then optional zero-padding, then rFFT for positive-frequency spectrum
             n = generated_signal.shape[0]
             if fft_window == 'hann':
@@ -90,6 +102,13 @@ def run_adam_optimization(
             gen_feature = torch.abs(gen_fft)
             max_val = torch.max(gen_feature)
             if max_val > 0: gen_feature = gen_feature / max_val
+            if feature_type == 'erb':
+                # Build frequency axis and ERB filterbank on device
+                freqs = torch.fft.rfftfreq(padded.shape[0], d=1.0 / sample_rate).to(device)
+                W = build_erb_filterbank_torch(freqs, n_bands=erb_n_bands, min_hz=erb_min_hz, max_hz=erb_max_hz)
+                gen_feature = W @ gen_feature
+                m = torch.max(gen_feature)
+                if m > 0: gen_feature = gen_feature / m
         elif feature_type == 'mfcc':
             gen_feature = compute_mfcc_torch(generated_signal, sample_rate)
         else:

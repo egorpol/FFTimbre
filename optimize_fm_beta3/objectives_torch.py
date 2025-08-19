@@ -2,6 +2,7 @@
 import torch
 import torch.nn.functional as F
 import torchaudio.transforms as T
+from typing import Optional
 
 # --- Feature Extraction (PyTorch native) ---
 
@@ -80,6 +81,118 @@ def itakura_saito_dist_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor) 
     
     return is_distance
 
+def log_spectral_distance_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor, epsilon: float = 1e-12, use_db: bool = True) -> torch.Tensor:
+    """LSD: RMSE of log-magnitude difference (dB or natural log)."""
+    gen = torch.clamp(gen_spec, min=epsilon)
+    tgt = torch.clamp(target_spec, min=epsilon)
+    if use_db:
+        gen_log = 20.0 * torch.log10(gen)
+        tgt_log = 20.0 * torch.log10(tgt)
+    else:
+        gen_log = torch.log(gen)
+        tgt_log = torch.log(tgt)
+    diff = gen_log - tgt_log
+    return torch.sqrt(torch.mean(diff * diff))
+
+def log_spectral_distance_weighted_torch(
+    gen_spec: torch.Tensor,
+    target_spec: torch.Tensor,
+    epsilon: float = 1e-12,
+    weight_floor: float = 0.05,
+    weight_power: float = 1.0,
+) -> torch.Tensor:
+    """Weighted LSD with log1p compression and target-derived weights."""
+    gen = torch.clamp(gen_spec, min=0.0)
+    tgt = torch.clamp(target_spec, min=0.0)
+    gen_log = torch.log1p(gen)
+    tgt_log = torch.log1p(tgt)
+    diff_sq = (gen_log - tgt_log) ** 2
+    w = tgt ** weight_power
+    w_sum = torch.sum(w)
+    w = torch.where(w_sum > 0, w / (w_sum + 1e-12), torch.full_like(w, 1.0 / w.numel()))
+    w = (1.0 - weight_floor) * w + weight_floor * (1.0 / w.numel())
+    return torch.sqrt(torch.sum(w * diff_sq))
+
+def _to_prob_torch(vec: torch.Tensor, epsilon: float = 1e-12) -> torch.Tensor:
+    v = torch.clamp(vec, min=0.0)
+    s = torch.sum(v)
+    return v / (s + epsilon)
+
+def kl_divergence_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor, epsilon: float = 1e-12) -> torch.Tensor:
+    """D_KL(P||Q) with P=target, Q=gen on normalized spectra."""
+    P = _to_prob_torch(target_spec, epsilon)
+    Q = _to_prob_torch(gen_spec, epsilon)
+    ratio = torch.clamp(P, min=epsilon) / torch.clamp(Q, min=epsilon)
+    return torch.sum(P * torch.log(ratio))
+
+def jensen_shannon_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor, epsilon: float = 1e-12) -> torch.Tensor:
+    P = _to_prob_torch(target_spec, epsilon)
+    Q = _to_prob_torch(gen_spec, epsilon)
+    M = 0.5 * (P + Q)
+    def _kl(a, b):
+        return torch.sum(a * (torch.log(torch.clamp(a, min=epsilon)) - torch.log(torch.clamp(b, min=epsilon))))
+    return 0.5 * _kl(P, M) + 0.5 * _kl(Q, M)
+
+def hellinger_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor, epsilon: float = 1e-12) -> torch.Tensor:
+    P = _to_prob_torch(target_spec, epsilon)
+    Q = _to_prob_torch(gen_spec, epsilon)
+    return torch.norm(torch.sqrt(P) - torch.sqrt(Q)) / (2.0 ** 0.5)
+
+def bhattacharyya_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor, epsilon: float = 1e-12) -> torch.Tensor:
+    P = _to_prob_torch(target_spec, epsilon)
+    Q = _to_prob_torch(gen_spec, epsilon)
+    bc = torch.sum(torch.sqrt(P * Q))
+    bc = torch.clamp(bc, min=epsilon, max=1.0)
+    return -torch.log(bc)
+
+def beta_divergence_torch(gen_spec: torch.Tensor, target_spec: torch.Tensor, beta: float, epsilon: float = 1e-12) -> torch.Tensor:
+    X = torch.clamp(target_spec, min=epsilon)
+    Y = torch.clamp(gen_spec, min=epsilon)
+    if abs(beta - 1.0) < 1e-9:
+        return kl_divergence_torch(Y, X, epsilon)  # D_KL(X||Y)
+    if abs(beta) < 1e-9:
+        return itakura_saito_dist_torch(Y, X)      # D_IS(X||Y)
+    term = (X ** beta + (beta - 1.0) * (Y ** beta) - beta * X * (Y ** (beta - 1.0)))
+    return torch.sum(term) / (beta * (beta - 1.0))
+
+def log_mse_l2_torch(gen_vec: torch.Tensor, target_vec: torch.Tensor, epsilon: float = 1e-12) -> torch.Tensor:
+    gen_log = torch.log(torch.clamp(gen_vec, min=epsilon))
+    tgt_log = torch.log(torch.clamp(target_vec, min=epsilon))
+    diff = gen_log - tgt_log
+    return torch.sqrt(torch.mean(diff * diff))
+
+def log_mse_l1_torch(gen_vec: torch.Tensor, target_vec: torch.Tensor, epsilon: float = 1e-12) -> torch.Tensor:
+    gen_log = torch.log(torch.clamp(gen_vec, min=epsilon))
+    tgt_log = torch.log(torch.clamp(target_vec, min=epsilon))
+    return torch.mean(torch.abs(gen_log - tgt_log))
+
+def _hz_to_erb_rate_torch(f_hz: torch.Tensor) -> torch.Tensor:
+    return 21.4 * torch.log10(1.0 + 4.37e-3 * f_hz)
+
+def build_erb_filterbank_torch(freqs: torch.Tensor, n_bands: int = 40, min_hz: float = 20.0, max_hz: Optional[float] = None) -> torch.Tensor:
+    """Triangular ERB-spaced filterbank over frequency axis. Returns (n_bands, n_bins)."""
+    device = freqs.device
+    dtype = freqs.dtype
+    if max_hz is None:
+        max_hz = float(freqs[-1].item())
+    freqs_erb = _hz_to_erb_rate_torch(freqs)
+    lo_e = float(_hz_to_erb_rate_torch(torch.tensor([min_hz], device=device, dtype=dtype))[0].item())
+    hi_e = float(_hz_to_erb_rate_torch(torch.tensor([max_hz], device=device, dtype=dtype))[0].item())
+    edges_e = torch.linspace(lo_e, hi_e, steps=n_bands + 2, device=device, dtype=dtype)
+    centers_e = edges_e[1:-1]
+    left_e = edges_e[:-2]
+    right_e = edges_e[2:]
+    W = torch.zeros((n_bands, freqs.shape[0]), device=device, dtype=dtype)
+    for i in range(n_bands):
+        up = (freqs_erb - left_e[i]) / max((centers_e[i] - left_e[i]).item(), 1e-12)
+        down = (right_e[i] - freqs_erb) / max((right_e[i] - centers_e[i]).item(), 1e-12)
+        tri = torch.clamp(torch.minimum(up, down), min=0.0)
+        s = torch.sum(tri)
+        if s > 0:
+            tri = tri / s
+        W[i, :] = tri
+    return W
+
 
 def build_target_spectrum_torch(
     frequencies: torch.Tensor,
@@ -146,6 +259,14 @@ TORCH_METRIC_FUNCTIONS = {
     'cosine_similarity': cosine_similarity_dist_torch,
     'pearson_correlation_coefficient': pearson_correlation_dist_torch,
     'itakura_saito': itakura_saito_dist_torch,
+    'log_spectral_distance': log_spectral_distance_torch,
+    'kl_divergence': kl_divergence_torch,
+    'jensen_shannon': jensen_shannon_torch,
+    'hellinger': hellinger_torch,
+    'bhattacharyya': bhattacharyya_torch,
+    'log_spectral_distance_weighted': log_spectral_distance_weighted_torch,
+    'erb_log_l2': log_mse_l2_torch,
+    'erb_log_l1': log_mse_l1_torch,
 }
 
 # We also need to map objective types to the feature they require
@@ -155,4 +276,29 @@ TORCH_METRIC_FEATURE_TYPE = {
     'cosine_similarity': 'spectrum',
     'pearson_correlation_coefficient': 'spectrum',
     'itakura_saito': 'spectrum',
+    'log_spectral_distance': 'spectrum',
+    'kl_divergence': 'spectrum',
+    'jensen_shannon': 'spectrum',
+    'hellinger': 'spectrum',
+    'bhattacharyya': 'spectrum',
+    'erb_log_l2': 'erb',
+    'erb_log_l1': 'erb',
 }
+
+def resolve_metric_torch(objective_type: str):
+    """Resolve an objective type to (metric_func, feature_type) in torch.
+    Supports parameterized 'beta_divergence:beta'."""
+    name = objective_type.strip().lower()
+    if name.startswith('beta_divergence'):
+        beta = 1.0
+        if ':' in name:
+            try:
+                beta = float(name.split(':', 1)[1])
+            except Exception:
+                beta = 1.0
+        def metric(gen_spec, target_spec, _beta=beta):
+            return beta_divergence_torch(gen_spec, target_spec, beta=_beta)
+        return metric, 'spectrum'
+    if name in TORCH_METRIC_FUNCTIONS and name in TORCH_METRIC_FEATURE_TYPE:
+        return TORCH_METRIC_FUNCTIONS[name], TORCH_METRIC_FEATURE_TYPE[name]
+    raise ValueError(f"Objective type '{objective_type}' is not implemented for PyTorch.")

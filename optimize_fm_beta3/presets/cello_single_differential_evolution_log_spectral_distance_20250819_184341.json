@@ -1,0 +1,21 @@
+{
+    "metadata": {
+        "optimization_method": "differential_evolution",
+        "optimization_pipeline": [],
+        "pipeline_label": "differential_evolution",
+        "objective_type": "log_spectral_distance",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 11.172101820394534
+    },
+    "params": [
+        1.00002267150908,
+        6.138903708246563,
+        149.19736655258856,
+        0.0,
+        1115.8982877532783,
+        0.10271871671560356,
+        368.813076997751,
+        0.16823325455810043
+    ]
+}

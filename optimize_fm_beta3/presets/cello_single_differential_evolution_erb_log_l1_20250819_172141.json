@@ -1,0 +1,21 @@
+{
+    "metadata": {
+        "optimization_method": "differential_evolution",
+        "optimization_pipeline": [],
+        "pipeline_label": "differential_evolution",
+        "objective_type": "erb_log_l1",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 2.5514000403750035
+    },
+    "params": [
+        1.2969899872673523,
+        8.255122465768403,
+        155.25799836984652,
+        1.2560796593960761,
+        5.89049033720039,
+        0.7989988283081093,
+        18.433742604227973,
+        1.5358663690331138
+    ]
+}

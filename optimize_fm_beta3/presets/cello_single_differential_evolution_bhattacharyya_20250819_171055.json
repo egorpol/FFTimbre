@@ -1,0 +1,21 @@
+{
+    "metadata": {
+        "optimization_method": "differential_evolution",
+        "optimization_pipeline": [],
+        "pipeline_label": "differential_evolution",
+        "objective_type": "bhattacharyya",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 0.744620566727464
+    },
+    "params": [
+        147.35791553962372,
+        8.86108638753523,
+        150.01788098508678,
+        0.24108318885909075,
+        73.66946607292266,
+        0.40408687555724576,
+        889.3182865444378,
+        0.12604090699209358
+    ]
+}

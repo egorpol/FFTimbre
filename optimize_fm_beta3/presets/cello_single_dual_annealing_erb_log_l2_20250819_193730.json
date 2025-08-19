@@ -1,0 +1,21 @@
+{
+    "metadata": {
+        "optimization_method": "dual_annealing",
+        "optimization_pipeline": [],
+        "pipeline_label": "dual_annealing",
+        "objective_type": "erb_log_l2",
+        "n_oscillators": 4,
+        "source_file": "tsv/cello_single.tsv",
+        "final_loss": 4.948192269363542
+    },
+    "params": [
+        115.491616293133,
+        3.621810033917427,
+        342.340999288023,
+        0.07057124384508254,
+        75.63246835023165,
+        0.15123896432476103,
+        32.96393585650647,
+        1.3130756691098213
+    ]
+}
