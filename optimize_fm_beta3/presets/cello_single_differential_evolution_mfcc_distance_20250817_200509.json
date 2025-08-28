@@ -1,7 +1,0 @@
-{
-    "metadata": {
-        "optimization_method": "differential_evolution",
-        "objective_type": "mfcc_distance",
-        "n_oscillators": 4,
-        "source_file": "tsv/cello_single.tsv",
-        "final_loss": 
