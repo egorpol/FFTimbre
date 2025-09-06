@@ -434,36 +434,52 @@ def run_basinhopping(
 # Plotting helpers (kept minimal / no seaborn)
 # -----------------------------------------------------------------------------
 
-def plot_time(signal: np.ndarray, sr: int, n_samples: int = 1000):
-    plt.figure(figsize=(10, 4))
-    plt.plot(signal[:n_samples])
-    plt.title("Optimized Combined Signal (time domain)")
-    plt.xlabel("Sample")
-    plt.ylabel("Amplitude")
-    plt.tight_layout()
-    plt.show()
+def plot_time(signal: np.ndarray, sr: int, n_samples: int = 1000, show: bool = True):
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(signal[:n_samples])
+    ax.set_title("Optimized Combined Signal (time domain)")
+    ax.set_xlabel("Sample")
+    ax.set_ylabel("Amplitude")
+    fig.tight_layout()
+    if show:
+        plt.show()
+        plt.close(fig)
+    else:
+        # Close to avoid duplicated inline display (open-figure + returned fig)
+        plt.close(fig)
+    return fig
 
 
-def plot_spectrum(signal: np.ndarray, sr: int,
-                  target_freqs: Optional[np.ndarray] = None,
-                  target_amps: Optional[np.ndarray] = None,
-                  xlim: Optional[Tuple[float, float]] = None,
-                  fft_pad: int = 1):
+def plot_spectrum(
+    signal: np.ndarray,
+    sr: int,
+    target_freqs: Optional[np.ndarray] = None,
+    target_amps: Optional[np.ndarray] = None,
+    xlim: Optional[Tuple[float, float]] = None,
+    fft_pad: int = 1,
+    show: bool = True,
+):
     freqs, mag = make_fft(signal, sr=sr, fft_pad=fft_pad)
     mag = mag / (np.max(mag) + 1e-12)
-    plt.figure(figsize=(10, 4))
-    plt.plot(freqs, mag, label="Optimized spectrum")
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(freqs, mag, label="Optimized spectrum")
     if target_freqs is not None and target_amps is not None:
         t_amps = target_amps / (np.max(target_amps) + 1e-12)
-        plt.scatter(target_freqs, t_amps, label="Target spectrum", color='red', zorder=5)
+        ax.scatter(target_freqs, t_amps, label="Target spectrum", color='red', zorder=5)
     if xlim is not None:
-        plt.xlim(*xlim)
-    plt.xlabel("Frequency (Hz)")
-    plt.ylabel("Amplitude (norm)")
-    plt.title("Frequency Spectrum of Optimized Signal")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+        ax.set_xlim(*xlim)
+    ax.set_xlabel("Frequency (Hz)")
+    ax.set_ylabel("Amplitude (norm)")
+    ax.set_title("Frequency Spectrum of Optimized Signal")
+    ax.legend()
+    fig.tight_layout()
+    if show:
+        plt.show()
+        plt.close(fig)
+    else:
+        # Close to avoid duplicated inline display (open-figure + returned fig)
+        plt.close(fig)
+    return fig
 
 
 def plot_error_history(history: list[float]):

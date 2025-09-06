@@ -54,7 +54,8 @@ To go from a TSV of optimized oscillator settings to the Operator preset, we adj
   - `spectral_ml_fm3.ipynb`, `spectral_ml_fm3_interactive.ipynb` — earlier/interactive FM experiments
   - `spectral_ml_fm4.ipynb` — guided single‑run workflow (optimize → preview → save)
   - `spectral_ml_fm4_batch.ipynb` — batch runner for metrics/optimizers with consistent naming
-  - `render_from_tsv_fm.ipynb` — render audio from saved TSV values
+  - `render_from_tsv_fm.ipynb` — render audio from saved TSV with optimized FM values
+  - `render_from_tsv_table.ipynb`
 
 ## Installation
 

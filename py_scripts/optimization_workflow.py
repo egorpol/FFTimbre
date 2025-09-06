@@ -162,6 +162,7 @@ def _run_one(
         plt.savefig(p_time, dpi=150)
         plt.close()
         plot_paths["time"] = p_time
+        print(f"[save_time_plot] wrote: {os.path.abspath(p_time)}")
 
         # Spectrum plot (normalized), overlay target partials
         freqs, mag = make_fft(y, sr=sr, fft_pad=fft_pad)
@@ -181,6 +182,7 @@ def _run_one(
         plt.savefig(p_spec, dpi=150)
         plt.close()
         plot_paths["spectrum"] = p_spec
+        print(f"[save_spectrum_plot] wrote: {os.path.abspath(p_spec)}")
 
         # Error history plot
         plt.figure(figsize=(10, 4))
@@ -194,6 +196,7 @@ def _run_one(
         plt.savefig(p_err, dpi=150)
         plt.close()
         plot_paths["error"] = p_err
+        print(f"[save_error_plot] wrote: {os.path.abspath(p_err)}")
 
     return {
         "method": method,

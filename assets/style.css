@@ -1,0 +1,95 @@
+/* Basic layout tweaks for the showcase */
+:root {
+  --max-w: 980px;
+}
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+}
+
+main, .page, .wrapper {
+  max-width: var(--max-w);
+}
+
+.sample {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 18px 0;
+  background: #fafafa;
+}
+
+.sample-title {
+  margin: 0 0 8px 0;
+}
+
+.sample-desc {
+  margin: 0 0 10px 0;
+  color: #444;
+}
+
+.sample-figure {
+  margin: 0 0 10px 0;
+}
+
+.sample-figure img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
+.sample-audio audio {
+  width: 100%;
+}
+
+.note {
+  padding: 10px 12px;
+  border-left: 4px solid #3a7bd5;
+  background: #f0f6ff;
+  margin: 16px 0;
+}
+
+/* Simple grid when you want multiple side-by-side */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+/* TSV tables */
+.tsv-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+.tsv-table th, .tsv-table td {
+  border-bottom: 1px solid #d0d0d0;
+  border-right: 1px solid #cfcfcf;
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tsv-table thead th {
+  background: #fafafa;
+  font-weight: 600;
+  border-bottom: 2px solid #bbb;
+}
+
+.tsv-table tbody tr > *:first-child { border-left: 1px solid #cfcfcf; }
+.tsv-table thead tr > *:first-child { border-left: 1px solid #cfcfcf; }
+
+.tsv-table tbody tr:nth-child(odd) { background: #fcfcfc; }
+.tsv-table tbody tr:hover { background: #f2f7ff; }
+
+.tsv-download {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.tsv-error {
+  color: #a00;
+}

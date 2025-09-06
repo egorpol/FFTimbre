@@ -1,0 +1,21 @@
+title: FFTimbre Showcase
+description: Audio samples and matching plots
+theme: jekyll-theme-minimal
+
+# Configure baseurl if this is a project page (username.github.io/repo)
+# For user/organization site (username.github.io), leave baseurl blank
+url: "https://egorpol.github.io"
+baseurl: "/FFTimbre"
+
+# Keep build simple and safe for GitHub Pages
+markdown: kramdown
+plugins:
+  - jekyll-seo-tag
+
+# Exclude dev-only or big files from the site build if desired
+# Uncomment to skip publishing notebooks, etc.
+# exclude:
+#   - "**/*.ipynb"
+#   - "**/.venv/**"
+#   - "**/.git/**"
+

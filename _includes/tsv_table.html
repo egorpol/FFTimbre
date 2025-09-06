@@ -1,0 +1,108 @@
+<div class="tsv-table" 
+     data-src="{{ include.src | relative_url }}"
+     data-delimiter="{{ include.delimiter | default: "&#9;" }}"
+     data-has-header="{{ include.has_header | default: true }}"
+     {% if include.max_rows %}data-max-rows="{{ include.max_rows }}"{% endif %}>
+  <em>Loading table from <a href="{{ include.src | relative_url }}">{{ include.src }}</a>…</em>
+  {% if include.caption %}<div class="tsv-caption">{{ include.caption }}</div>{% endif %}
+</div>
+<noscript>
+  <p>JavaScript is required to render the table. You can <a href="{{ include.src | relative_url }}">download the TSV</a>.</p>
+</noscript>
+<script>
+(function() {
+  var scriptEl = document.currentScript;
+  if (!scriptEl) return;
+  var container = scriptEl.previousElementSibling;
+  if (container && container.tagName === 'NOSCRIPT') {
+    container = container.previousElementSibling;
+  }
+  if (!container || !(container.classList && container.classList.contains('tsv-table'))) {
+    var sib = container;
+    while (sib && !(sib.classList && sib.classList.contains('tsv-table'))) {
+      sib = sib.previousElementSibling;
+    }
+    container = sib;
+  }
+  if (!container) return;
+
+  var url = container.getAttribute('data-src') || (container.dataset && container.dataset.src);
+  if (!url) {
+    container.innerHTML = '<div class="tsv-error">Missing data-src on TSV container.</div>';
+    return;
+  }
+  // Read delimiter and normalize common escape sequences
+  var delimiterRaw = container.getAttribute('data-delimiter');
+  var delimiter = (delimiterRaw == null || delimiterRaw === '') ? '\t' : delimiterRaw;
+  // Map common escape strings (e.g., "\\t") to real characters
+  if (delimiter === '\\t') delimiter = '\t';
+  if (delimiter === '\\n') delimiter = '\n';
+  if (delimiter === '\\r') delimiter = '\r';
+  if (delimiter === '\\s') delimiter = ' ';
+  var hasHeaderAttr = (container.getAttribute('data-has-header') || 'true').toString().toLowerCase();
+  var hasHeader = !(hasHeaderAttr === 'false' || hasHeaderAttr === '0' || hasHeaderAttr === 'no');
+  var maxRowsAttr = container.getAttribute('data-max-rows');
+  var maxRows = maxRowsAttr ? parseInt(maxRowsAttr, 10) : null;
+
+  function parseTable(text) {
+    var lines = text
+      .replace(/\r\n?/g, '\n')
+      .split('\n')
+      .filter(function(l){ return l.trim().length > 0;});
+    return lines.map(function(line) { return line.split(delimiter); });
+  }
+
+  function buildTable(rows) {
+    var table = document.createElement('table');
+    if (rows.length === 0) return table;
+    var startIdx = 0;
+    if (hasHeader) {
+      var thead = document.createElement('thead');
+      var tr = document.createElement('tr');
+      rows[0].forEach(function(h) {
+        var th = document.createElement('th');
+        th.textContent = h;
+        tr.appendChild(th);
+      });
+      thead.appendChild(tr);
+      table.appendChild(thead);
+      startIdx = 1;
+    }
+    var tbody = document.createElement('tbody');
+    for (var i = startIdx; i < rows.length; i++) {
+      if (maxRows && (i - startIdx) >= maxRows) break;
+      var trb = document.createElement('tr');
+      rows[i].forEach(function(cell) {
+        var td = document.createElement('td');
+        td.textContent = cell;
+        trb.appendChild(td);
+      });
+      tbody.appendChild(trb);
+    }
+    table.appendChild(tbody);
+    return table;
+  }
+
+  fetch(url, { credentials: 'same-origin' })
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.text();
+    })
+    .then(function(text) {
+      var rows = parseTable(text);
+      var table = buildTable(rows);
+      container.innerHTML = '';
+      container.appendChild(table);
+      var dl = document.createElement('div');
+      dl.className = 'tsv-download';
+      dl.innerHTML = '<a href="' + url + '">Download TSV</a>' + (maxRows ? ' · showing first ' + maxRows + ' rows' : '');
+      container.appendChild(dl);
+    })
+    .catch(function(err) {
+      container.innerHTML = '<div class="tsv-error">Failed to load table (' + (err && err.message ? err.message : err) + '). ' +
+                            'Try <a href="' + url + '">downloading the TSV</a>.</div>';
+    });
+})();
+</script>
+
+

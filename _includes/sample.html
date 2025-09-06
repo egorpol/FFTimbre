@@ -1,0 +1,68 @@
+<div class="sample">
+  {% if include.title %}
+  <h3 class="sample-title">{{ include.title }}</h3>
+  {% endif %}
+  {% if include.description %}
+  <p class="sample-desc">{{ include.description }}</p>
+  {% endif %}
+
+  {%- assign _plots = nil -%}
+  {%- if include.plots -%}
+    {%- assign _plots = include.plots | split: '|' -%}
+  {%- elsif include.plot -%}
+    {%- assign _plots = include.plot | split: '|' -%}
+  {%- endif -%}
+
+  {%- assign _captions = nil -%}
+  {%- if include.captions -%}
+    {%- assign _captions = include.captions | split: '|' -%}
+  {%- elsif include.caption -%}
+    {%- assign _captions = include.caption | split: '|' -%}
+  {%- endif -%}
+
+  {%- if _plots and _plots.size > 1 -%}
+    <div class="sample-figures grid">
+      {%- for p in _plots -%}
+      <figure class="sample-figure">
+        <a href="{{ p | relative_url }}" target="_blank" rel="noopener noreferrer">
+          <img src="{{ p | relative_url }}" alt="{{ include.title | default: 'Plot' }}">
+        </a>
+        {%- assign _cap = nil -%}
+        {%- if _captions and _captions.size > 0 -%}
+          {%- if forloop.index0 < _captions.size -%}
+            {%- assign _cap = _captions[forloop.index0] -%}
+          {%- else -%}
+            {%- assign _cap = _captions[0] -%}
+          {%- endif -%}
+        {%- endif -%}
+        {%- if _cap and _cap != '' -%}
+        <figcaption>{{ _cap }}</figcaption>
+        {%- endif -%}
+      </figure>
+      {%- endfor -%}
+    </div>
+  {%- elsif include.plot -%}
+    <figure class="sample-figure">
+      <a href="{{ include.plot | relative_url }}" target="_blank" rel="noopener noreferrer">
+        <img src="{{ include.plot | relative_url }}" alt="{{ include.title | default: 'Plot' }}">
+      </a>
+      {%- assign _cap_single = nil -%}
+      {%- if _captions and _captions.size > 0 -%}
+        {%- assign _cap_single = _captions[0] -%}
+      {%- endif -%}
+      {%- if _cap_single and _cap_single != '' -%}
+      <figcaption>{{ _cap_single }}</figcaption>
+      {%- endif -%}
+    </figure>
+  {%- endif -%}
+
+  {% if include.audio %}
+  <div class="sample-audio">
+    <audio controls preload="none" src="{{ include.audio | relative_url }}">
+      Your browser does not support the audio element. 
+      <a href="{{ include.audio | relative_url }}">Download audio</a>
+    </audio>
+  </div>
+  {% endif %}
+</div>
+
