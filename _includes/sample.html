@@ -1,4 +1,4 @@
-<div class="sample{% if include.wide %} sample--wide full-bleed{% endif %}">
+<div class="sample">
   {% if include.title %}
   <h3 class="sample-title" id="{{ include.id | default: include.title | slugify }}">{{ include.title }}</h3>
   {% endif %}
@@ -21,7 +21,7 @@
   {%- endif -%}
 
   {%- if _plots and _plots.size > 1 -%}
-    <div class="sample-figures grid{% if include.wide %} grid--wide{% endif %}">
+    <div class="sample-figures grid">
       {%- for p in _plots -%}
       <figure class="sample-figure">
         <a href="{{ p | relative_url }}" target="_blank" rel="noopener noreferrer">

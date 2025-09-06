@@ -37,10 +37,9 @@ Source: [`tsv/cello_single.tsv`]({{ '/tsv/cello_single.tsv' | relative_url }})
 {% include sample.html 
    title="Target spectra"
    description="Reference spectrogram and waveform for the bowed cello FFT frame."
-   audio="/rendered_audio/additive_from_cello_single_2.0s_20250906-080046.wav"
-   plot="/rendered_plots/additive_from_cello_single_2.0s_20250906-095503_spectrum.png|/rendered_plots/additive_from_cello_single_2.0s_20250906-095503_time.png"
+   audio="/rendered_audio/additive_from_cello_single_2.0s_20250906-215542.wav"
+   plot="/rendered_plots/additive_from_cello_single_2.0s_20250906-215542_spectrum.png|/rendered_plots/additive_from_cello_single_2.0s_20250906-215542_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 Results below are from a batch run (`maxiter=500`) across metrics using Differential Evolution.
@@ -51,7 +50,6 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_cosine_20250904-003735.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_cosine_20250904-003735_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_cosine_20250904-003735_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 {% include sample.html 
@@ -60,7 +58,6 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_euclidean_20250904-004049.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_euclidean_20250904-004049_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_euclidean_20250904-004049_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 {% include sample.html 
@@ -69,7 +66,6 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_itakura_saito_20250904-003136.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_itakura_saito_20250904-003136_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_itakura_saito_20250904-003136_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 {% include sample.html 
@@ -78,7 +74,6 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_kl_20250904-004429.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_kl_20250904-004429_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_kl_20250904-004429_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 {% include sample.html 
@@ -87,7 +82,6 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_manhattan_20250904-004211.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_manhattan_20250904-004211_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_manhattan_20250904-004211_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 {% include sample.html 
@@ -96,7 +90,6 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_mfcc_20250904-002651.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_mfcc_20250904-002651_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_mfcc_20250904-002651_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 {% include sample.html 
@@ -105,7 +98,6 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_pearson_20250904-002050.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_pearson_20250904-002050_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_pearson_20250904-002050_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}
 
 {% include sample.html 
@@ -114,5 +106,4 @@ Results below are from a batch run (`maxiter=500`) across metrics using Differen
    audio="/rendered_audio/optimized_output_fm_cello_single_de_spectral_convergence_20250904-003453.wav"
    plot="/rendered_plots/optimized_output_fm_cello_single_de_spectral_convergence_20250904-003453_spectrum.png|/rendered_plots/optimized_output_fm_cello_single_de_spectral_convergence_20250904-003453_time.png"
    captions="Spectrogram|Waveform"
-   wide=true
 %}

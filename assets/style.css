@@ -1,7 +1,6 @@
 /* Basic layout tweaks for the showcase */
 :root {
-  /* Keep normal content readable, but roomier */
-  --max-w: min(1200px, 92vw);
+  --max-w: 980px;
 }
 
 body {
@@ -59,34 +58,7 @@ main, .page, .wrapper {
   gap: 12px;
 }
 
-/* Wide/full-bleed sections for plots/examples */
-.full-bleed {
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  width: 100vw;
-  max-width: 100vw;
-}
-
-.sample--wide {
-  border: none;
-  border-radius: 0;
-  padding-left: min(24px, 4vw);
-  padding-right: min(24px, 4vw);
-  background: transparent;
-}
-
-.grid--wide {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 16px;
-}
-
-.sample--wide .sample-figure img {
-  width: 100%;
-  height: auto;
-}
+/* (wide/full-bleed styles removed to align with GitHub Pages render) */
 
 /* TSV tables */
 .tsv-table table {
