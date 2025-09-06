@@ -2,6 +2,8 @@
 
 FFTimbre is a small toolkit of notebooks and helpers for spectral matching via FM and additive synthesis. It started as an exploratory idea inside [audiospylt](https://github.com/egorpol/audiospylt) and has since grown into its own project.
 
+Live site (audio + plots): https://egorpol.github.io/FFTimbre/
+
 This setup was introduced in a talk at the InMusic'24 conference (Oslo). Slides are available in `inmusic24_slides/`. A paper version is planned for the InMusic'24 proceedings (Routledge).
 
 ## Overview
@@ -30,6 +32,13 @@ To go from a TSV of optimized oscillator settings to the Operator preset, we adj
 ## Repository Structure
 
 - `inmusic24_slides/` — conference slides (PDF/PPTX)
+\- Website (GitHub Pages)
+  - `index.md` — site homepage with audio/plot gallery
+  - `_config.yml` — Jekyll site config (project page)
+  - `_includes/` — reusable HTML includes
+    - `sample.html` — audio + plot block
+    - `tsv_table.html` — dynamic TSV preview
+  - `assets/style.css` — site stylesheet
 - `py_scripts/`
   - `fm_synth_opt.py` — objective, synthesis, optimization runners, plotting, I/O helpers
   - `optimization_workflow.py` — batch job utilities and consistent file naming
@@ -55,7 +64,7 @@ To go from a TSV of optimized oscillator settings to the Operator preset, we adj
   - `spectral_ml_fm4.ipynb` — guided single‑run workflow (optimize → preview → save)
   - `spectral_ml_fm4_batch.ipynb` — batch runner for metrics/optimizers with consistent naming
   - `render_from_tsv_fm.ipynb` — render audio from saved TSV with optimized FM values
-  - `render_from_tsv_table.ipynb`
+  - `render_from_tsv_table.ipynb` — render audio from TSV of partials (freq/amp)
 
 ## Installation
 
@@ -142,4 +151,3 @@ save_and_display_final_values(params, "tsv/final_values_fm.tsv")
 ## License
 
 MIT — see `LICENSE`.
-
