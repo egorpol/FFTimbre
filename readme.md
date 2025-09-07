@@ -1,10 +1,12 @@
 # FFTimbre
 
+[![License](https://img.shields.io/github/license/egorpol/FFTimbre)](LICENSE) [![Last commit](https://img.shields.io/github/last-commit/egorpol/FFTimbre)](https://github.com/egorpol/FFTimbre/commits) [![Issues](https://img.shields.io/github/issues/egorpol/FFTimbre)](https://github.com/egorpol/FFTimbre/issues) [![Stars](https://img.shields.io/github/stars/egorpol/FFTimbre)](https://github.com/egorpol/FFTimbre/stargazers) [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](#installation) [![Made with Jupyter](https://img.shields.io/badge/Made%20with-Jupyter-orange)](https://jupyter.org)
+
 FFTimbre is a small toolkit of notebooks and helpers for spectral matching via FM and additive synthesis. It started as an exploratory idea inside [audiospylt](https://github.com/egorpol/audiospylt) and has since grown into its own project.
 
 Live site (audio + plots): https://egorpol.github.io/FFTimbre/
 
-This setup was introduced in a talk at the InMusic'24 conference (Oslo). Slides are available in `inmusic24_slides/`. A paper version is planned for the InMusic'24 proceedings (Routledge).
+This work was presented at the InMusic'24 conference (Oslo). Slides are available in `inmusic24_slides/`. A paper version is planned for the InMusic'24 proceedings (Routledge).
 
 ## Overview
 
@@ -29,10 +31,14 @@ After optimization we get a TSV with oscillator values. We can synthesize it in 
 We target two Operator setups: FM (algorithm 0 — the leftmost in the Operator GUI) and additive (algorithm 10 — the rightmost).
 To go from a TSV of optimized oscillator settings to the Operator preset, we adjust value formatting and write the preset data into a compressed XML file.
 
+In its current state, FFTimbre is an exploration tool that showcases various metrics and optimizers, aimed at artistic and exploratory use. Some metric/optimizer combinations can produce unexpected yet interesting results, including unconventional parameter settings. A general limitation is that it currently operates on a single DFT frame, which restricts the system to static sounds.
+
+An improved version with additional metrics and optimizers, as well as a freely configurable oscillator setup, is currently in development and planned for release next year.
+
 ## Repository Structure
 
 - `inmusic24_slides/` — conference slides (PDF/PPTX)
-\- Website (GitHub Pages)
+- Website (GitHub Pages)
   - `index.md` — site homepage with audio/plot gallery
   - `_config.yml` — Jekyll site config (project page)
   - `_includes/` — reusable HTML includes
@@ -147,6 +153,28 @@ save_and_display_final_values(params, "tsv/final_values_fm.tsv")
 - Risset, J.-C., & Wessel, D. (1999). Exploration of timbre by analysis and synthesis. In D. Deutsch (Ed.), The psychology of music (pp. 113–169). Academic Press.
 - SciPy optimization (`differential_evolution`, `dual_annealing`, `basinhopping`): [scipy.org](https://scipy.org)
 - Librosa features (MFCC): [librosa.org](https://librosa.org)
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome! Please check the issues page and open a discussion before major changes. For small fixes or documentation improvements, feel free to submit a pull request.
+
+- Issues: https://github.com/egorpol/FFTimbre/issues
+- Pull requests: https://github.com/egorpol/FFTimbre/pulls
+
+## How to Cite
+
+This work was presented at InMusic'24. If you use this toolkit in your research, please cite the upcoming paper in the conference proceedings (Routledge). A pre-print or final citation will be provided here when available.
+
+Until then, you can cite the project as:
+
+```bibtex
+@misc{FFTimbre,
+  title        = {FFTimbre: Spectral Matching via FM and Additive Synthesis},
+  year         = {2025},
+  howpublished = {\url{https://github.com/egorpol/FFTimbre}},
+  note         = {Accessed: 2025-09-07}
+}
+```
 
 ## License
 
