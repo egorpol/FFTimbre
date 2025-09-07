@@ -1,6 +1,6 @@
 # FFTimbre
 
-[![License](https://img.shields.io/github/license/egorpol/FFTimbre)](LICENSE) [![Last commit](https://img.shields.io/github/last-commit/egorpol/FFTimbre)](https://github.com/egorpol/FFTimbre/commits) [![Issues](https://img.shields.io/github/issues/egorpol/FFTimbre)](https://github.com/egorpol/FFTimbre/issues) [![Stars](https://img.shields.io/github/stars/egorpol/FFTimbre)](https://github.com/egorpol/FFTimbre/stargazers) [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](#installation) [![Made with Jupyter](https://img.shields.io/badge/Made%20with-Jupyter-orange)](https://jupyter.org)
+[![License](https://img.shields.io/github/license/egorpol/FFTimbre)](LICENSE) [![Last commit](https://img.shields.io/github/last-commit/egorpol/FFTimbre)](https://github.com/egorpol/FFTimbre/commits) [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](#installation) [![Made with Jupyter](https://img.shields.io/badge/Made%20with-Jupyter-orange)](https://jupyter.org)
 
 FFTimbre is a small toolkit of notebooks and helpers for spectral matching via FM and additive synthesis. It started as an exploratory idea inside [audiospylt](https://github.com/egorpol/audiospylt) and has since grown into its own project.
 
