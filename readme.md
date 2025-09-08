@@ -45,6 +45,7 @@ An improved version with additional metrics and optimizers, as well as a freely 
     - `sample.html` — audio + plot block
     - `tsv_table.html` — dynamic TSV preview
   - `assets/style.css` — site stylesheet
+  - `examples/` — per‑example subpages (cello/voice/Parmegiani)
 - `py_scripts/`
   - `fm_synth_opt.py` — objective, synthesis, optimization runners, plotting, I/O helpers
   - `optimization_workflow.py` — batch job utilities and consistent file naming
@@ -87,6 +88,21 @@ pip install -r requirements.txt
 - Pick a target from `tsv/` (e.g., `cello_single.tsv`), run optimization, and preview.
 - Outputs are written to `rendered_audio/` (WAV), `rendered_plots/` (PNG), and `tsv/` (final values).
 - For multiple metrics/optimizers, try `spectral_ml_fm4_batch.ipynb`.
+
+## GitHub Pages (Site)
+
+- **Hosting**: Built with Jekyll and published via GitHub Pages as a project site at `https://egorpol.github.io/FFTimbre/`.
+- **Config**: `/_config.yml` sets `url` and `baseurl` for project hosting.
+- **Homepage**: `/index.md` shows cello results plus links to other examples.
+- **Examples**: Per‑example subpages live in `/examples/`:
+  - `/examples/cello.md`
+  - `/examples/voice-single2.md`
+  - `/examples/parm.md`
+- **Includes**: Reusable blocks in `/_includes/`:
+  - `tsv_table.html` renders TSV previews (client‑side).
+  - `sample.html` embeds audio and one or two plots side‑by‑side.
+- **Clickable plots**: All plots are clickable to open the full‑resolution image in a new tab.
+- **Anchors**: Section ids come from titles (slugified), so legend links like “Optimized FM with DE + cosine” → `#optimized-fm-with-de-cosine` work automatically.
 
 ## Usage (Programmatic)
 
