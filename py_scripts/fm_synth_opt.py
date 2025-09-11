@@ -218,7 +218,17 @@ class FMObjective:
             return float(num / den)
 
         if self.metric == "cosine":
-            return float(cosine_distance(mag, target))
+            # Safe cosine distance: guard against zero vectors to avoid divide-by-zero warnings
+            norm_mag = float(np.linalg.norm(mag))
+            norm_tgt = float(np.linalg.norm(target))
+            denom = norm_mag * norm_tgt
+            if denom <= 1e-12 or not np.isfinite(denom):
+                return 1.0
+            num = float(np.dot(mag, target))
+            val = 1.0 - (num / denom)
+            if not np.isfinite(val):
+                return 1.0
+            return float(val)
 
         if self.metric == "euclidean":
             return float(np.linalg.norm(mag - target))
