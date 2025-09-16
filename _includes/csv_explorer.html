@@ -1,0 +1,198 @@
+{% assign _csv_path = include.csv_path | default: 'examples/cello_eval.csv' %}
+{% assign _id_seed = include.id | default: _csv_path %}
+{% assign _id_norm = _id_seed | replace: '/', '-' | replace: '\\', '-' | replace: '.', '-' %}
+<div id="csvexp-{{ _id_norm }}" class="csv-explorer" data-csv="{{ _csv_path }}" data-base="{{ site.baseurl | default: '' }}"></div>
+<style>
+#csvexp-{{ _id_norm }} { margin: 1rem 0; }
+#csvexp-{{ _id_norm }} .controls { display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; margin-bottom: .75rem; }
+#csvexp-{{ _id_norm }} .main-controls { display: flex; flex-direction: column; gap: .5rem; width: 240px; }
+#csvexp-{{ _id_norm }} .aux-controls { display: flex; flex-direction: row; gap: 0; width: 240px; }
+#csvexp-{{ _id_norm }} .aux-controls label { display: inline-flex; align-items: center; }
+#csvexp-{{ _id_norm }} .aux-controls input[type="checkbox"] { margin-right: .4rem; }
+#csvexp-{{ _id_norm }} .aux-controls .cb-audio { margin-left: 120px; }
+#csvexp-{{ _id_norm }} label { font-size: .9rem; }
+#csvexp-{{ _id_norm }} .controls label { display: block; }
+#csvexp-{{ _id_norm }} select, #csvexp-{{ _id_norm }} input[type="text"], #csvexp-{{ _id_norm }} input[type="number"] { padding: .25rem .4rem; box-sizing: border-box; width: 100%; }
+#csvexp-{{ _id_norm }} .table { overflow-x: auto; margin: .5rem 0; }
+#csvexp-{{ _id_norm }} table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+#csvexp-{{ _id_norm }} th, #csvexp-{{ _id_norm }} td { border-bottom: 1px solid #ddd; padding: .35rem .5rem; text-align: left; }
+#csvexp-{{ _id_norm }} .bars .bar-row { display: grid; grid-template-columns: 300px 80px 1fr; align-items: center; gap: .5rem; margin: .2rem 0; }
+#csvexp-{{ _id_norm }} .bars .bar { height: 12px; background: steelblue; }
+#csvexp-{{ _id_norm }} .bars .val { text-align: left; font-variant-numeric: tabular-nums; color: #333; }
+#csvexp-{{ _id_norm }} .audios .item { margin: .5rem 0; }
+#csvexp-{{ _id_norm }} .muted { color: #666; font-size: .85rem; }
+</style>
+<script>
+(function(){
+  const ROOT_ID = 'csvexp-{{ _id_norm }}';
+  const root = document.getElementById(ROOT_ID);
+  if (!root) return;
+  const base = root.dataset.base || '';
+  const csvPath = root.dataset.csv || 'examples/cello_eval.csv';
+  const knownMetrics = [
+    'time_mse','cosine_logmag','pearson_logmag','spectral_convergence','lsd_db','itakura_saito','mfcc_l2',
+    'flatness_l1','centroid_rmse_hz','rolloff_rmse_hz','mrstft','mel_l1','mel_mrstft','composite'
+  ];
+
+  function urlJoin(a, b){
+    if (!a) a = '';
+    if (!b) b = '';
+    return (a.replace(/\/+$/,'') + '/' + b.replace(/^\/+/,'')) || '/';
+  }
+  const csvUrl = urlJoin(base, '/' + csvPath);
+
+  root.innerHTML = '' +
+    '<div class="controls">' +
+      '<div class="main-controls">' +
+        '<label>Metric<br><select data-role="metric"></select></label>' +
+        '<label>Top K<br><input type="number" min="5" step="1" value="10" data-role="topk"></label>' +
+        '<label>Sort<br><select data-role="sort"><option value="asc">asc</option><option value="desc">desc</option></select></label>' +
+        '<label>Filter title<br><input type="text" placeholder="substring" data-role="filter"></label>' +
+      '</div>' +
+      '<div class="aux-controls">' +
+        '<label class="cb-norm"><input type="checkbox" data-role="norm"> Normalize [0,1]</label>' +
+        '<label class="cb-audio"><input type="checkbox" data-role="audio" checked> Show audio</label>' +
+      '</div>' +
+    '</div>' +
+    '<div class="table"></div>' +
+    '<div class="bars"></div>' +
+    '<div class="audios"></div>';
+
+  const els = {
+    metric: root.querySelector('[data-role="metric"]'),
+    sort: root.querySelector('[data-role="sort"]'),
+    norm: root.querySelector('[data-role="norm"]'),
+    topk: root.querySelector('[data-role="topk"]'),
+    filter: root.querySelector('[data-role="filter"]'),
+    audio: root.querySelector('[data-role="audio"]'),
+    tbl: root.querySelector('.table'),
+    bars: root.querySelector('.bars'),
+    auds: root.querySelector('.audios')
+  };
+
+  function parseCSV(text){
+    const lines = text.trim().split(/\r?\n/);
+    if (!lines.length) return [];
+    const hdr = lines[0].split(',').map(s=>s.trim());
+    const rows = [];
+    for (let i=1;i<lines.length;i++){
+      if (!lines[i].trim()) continue;
+      const cols = lines[i].split(',');
+      const obj = {};
+      for (let j=0;j<hdr.length && j<cols.length;j++){
+        const key = hdr[j];
+        const raw = cols[j].trim();
+        const val = raw === '' ? '' : (isFinite(raw) ? parseFloat(raw) : raw);
+        obj[key] = val;
+      }
+      rows.push(obj);
+    }
+    return rows;
+  }
+
+  function formatNum(x){ return (x===undefined || x===null || !isFinite(x)) ? '' : (Math.round(x*1e6)/1e6).toString(); }
+
+  function render(data){
+    const metric = els.metric.value;
+    const asc = (els.sort.value === 'asc');
+    const topk = Math.max(5, parseInt(els.topk.value||'10',10));
+    const filter = (els.filter.value||'').toLowerCase();
+    const showAudio = els.audio.checked;
+
+    let df = data.slice();
+    if (filter){ df = df.filter(r => String(r.title||'').toLowerCase().includes(filter)); }
+    // derive normalization
+    if (els.norm.checked){
+      const vals = df.map(r => r[metric]).filter(v => isFinite(v));
+      const lo = Math.min.apply(null, vals);
+      const hi = Math.max.apply(null, vals);
+      df.forEach(r => {
+        const v = r[metric];
+        r.__val = (isFinite(v) ? ((hi - lo) < 1e-12 ? 0.5 : (v - lo)/(hi - lo)) : NaN);
+      });
+    } else {
+      df.forEach(r => { r.__val = r[metric]; });
+    }
+    df = df.filter(r => isFinite(r.__val));
+    df.sort((a,b) => asc ? (a.__val - b.__val) : (b.__val - a.__val));
+    const top = df.slice(0, topk);
+
+    // Table
+    let html = '<table><thead><tr><th>Title</th><th>'+metric+'</th><th>Path</th></tr></thead><tbody>';
+    top.forEach(r => {
+      html += '<tr><td>'+ (r.title||'') +'</td><td>'+ formatNum(r.__val) +'</td><td class="muted">'+ (r.path||'') +'</td></tr>';
+    });
+    html += '</tbody></table>';
+    els.tbl.innerHTML = html;
+
+    // Bars
+    const maxVal = Math.max.apply(null, top.map(r => r.__val));
+    const BAR_W = 300;
+    const barHtml = top.map(r => {
+      const w = maxVal > 0 ? Math.max(3, Math.round((r.__val/maxVal)*BAR_W)) : 3;
+      return '<div class="bar-row">'
+        + '<div class="bar-outer" style="width:'+BAR_W+'px;background:#eee"><div class="bar" style="width:'+w+'px"></div></div>'
+        + '<div class="val">'+ formatNum(r.__val) +'</div>'
+        + '<div class="title">'+ (r.title||'') +'</div>'
+        + '</div>';
+    }).join('');
+    els.bars.innerHTML = '<div class="muted">Top results</div>' + barHtml;
+
+    // Audio list
+    els.auds.innerHTML = '';
+    if (showAudio){
+      const frag = document.createDocumentFragment();
+      const head = document.createElement('div'); head.innerHTML = '<b>Audio (in current order):</b>';
+      frag.appendChild(head);
+      top.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        const p = document.createElement('div');
+        p.innerHTML = '<b>'+ (r.title||'') +'</b> &nbsp; <span class="muted">'+ (r.path||'') +'</span>';
+        const a = document.createElement('audio');
+        a.controls = true; a.preload = 'none';
+        const src = urlJoin(base, '/' + String(r.path||''));
+        a.src = src;
+        div.appendChild(p);
+        div.appendChild(a);
+        frag.appendChild(div);
+      });
+      els.auds.appendChild(frag);
+    }
+  }
+
+  fetch(csvUrl, {cache:'no-store'})
+    .then(r => { if (!r.ok) throw new Error('Failed to load CSV: '+r.status); return r.text(); })
+    .then(text => {
+      const data = parseCSV(text);
+      if (!data.length){ root.querySelector('.table').innerHTML = '<div class="muted">No data.</div>'; return; }
+      const cols = Object.keys(data[0]);
+      const present = knownMetrics.filter(m => cols.includes(m));
+      const hasComposite = present.includes('composite');
+      const ordered = hasComposite
+        ? ['composite'].concat(present.filter(m => m !== 'composite').sort((a,b)=>a.localeCompare(b)))
+        : present.sort((a,b)=>a.localeCompare(b));
+      els.metric.innerHTML = ordered.map(m => '<option value="'+m+'">'+m+'</option>').join('');
+      els.metric.value = hasComposite ? 'composite' : (ordered[0] || '');
+
+      // Max for TopK
+      els.topk.max = String(Math.max(10, data.length));
+
+      const onChange = () => render(data);
+      ['change','input'].forEach(ev => {
+        els.metric.addEventListener(ev, onChange);
+        els.sort.addEventListener(ev, onChange);
+        els.norm.addEventListener(ev, onChange);
+        els.topk.addEventListener(ev, onChange);
+        els.filter.addEventListener(ev, onChange);
+        els.audio.addEventListener(ev, onChange);
+      });
+      render(data);
+    })
+    .catch(err => {
+      root.querySelector('.table').innerHTML = '<div style="color:#b00">'+ String(err) +'</div>';
+    });
+})();
+</script>
+
+
