@@ -73,7 +73,7 @@ An improved version with additional metrics and optimizers, as well as a freely 
   - `spectral_ml_fm3.ipynb`, `spectral_ml_fm3_interactive.ipynb` - earlier/interactive FM experiments
   - `spectral_ml_fm4.ipynb` - guided single-run workflow (optimize -> preview -> save)
   - `spectral_ml_fm4_batch.ipynb` - batch runner for metrics/optimizers with consistent naming
-  - `evaluate_cello_examples.ipynb`, `evaluate_parm_examples.ipynb`, `evaluate_voice_examples.ipynb` - generate evaluation CSVs and audio links for the site explorers
+  - `evaluate_cello_examples.ipynb`, `evaluate_parm_examples.ipynb`, `evaluate_voice_examples.ipynb` - generate evaluation CSVs and audio links for the site explorers. Includes an interactive IPython tool for visualization and exploration (prototype for the live-page implementation).
   - `render_from_tsv_fm.ipynb` - render audio from saved TSV with optimized FM values
   - `render_from_tsv_table.ipynb` - render audio from TSV of partials (freq/amp)
 
@@ -109,7 +109,7 @@ Optimization runs are slow: a single optimization can take 20-30 minutes. Loweri
   - `tsv_table.html` renders TSV previews (client-side).
   - `sample.html` embeds audio and one or two plots side-by-side.
 - **Clickable plots**: All plots are clickable to open the full-resolution image in a new tab.
-- **Anchors**: Section ids come from titles (slugified), so legend links like "Optimized FM with DE + cosine" -> `#optimized-fm-with-de-cosine` work automatically.
+- **Anchors**: Section IDs come from titles (slugified), so legend links like "Optimized FM with DE + cosine" -> `#optimized-fm-with-de-cosine` work automatically.
 
 ## Evaluation Workflows
 
@@ -166,22 +166,21 @@ save_and_display_final_values(params, "tsv/final_values_fm.tsv")
 
 - **Objective metrics**: Itakura-Saito (`itakura_saito`), Spectral Convergence (`spectral_convergence`), Cosine (`cosine`), Euclidean (`euclidean`), Manhattan (`manhattan`), KL (`kl`), Pearson (`pearson`), MFCC (`mfcc`).
 - **Optimizers**: Differential Evolution (DE), Dual Annealing (DA), Basin Hopping (BH).
-- **Evaluation metrics**: See [Evaluation metrics (lower is better unless noted)](#evaluation-metrics-lower-is-better-unless-noted) for the scoring criteria used outside the optimization loop.
 
 ## Evaluation metrics (lower is better unless noted)
-- Time MSE: Mean-squared error in time domain after RMS normalization and short-window alignment.
-- Cosine distance (log-magnitude STFT): Cosine distance of flattened log |STFT|.
-- Pearson distance (log-magnitude STFT): 1 - Pearson correlation of flattened log |STFT|.
-- Spectral convergence: ||S - S_hat|| / (||S|| + epsilon); emphasizes relative spectral errors.
-- Log-spectral distance (dB): RMSE between amplitude-in-dB spectra; classic perceptual scale.
-- Itakura-Saito divergence (power): D_IS(S**2 || S_hat**2); scale-sensitive spectral mismatch.
-- MFCC L2: L2 distance of MFCC sequences (aligned in time to minimum length).
-- Spectral flatness L1: Mean absolute difference of spectral flatness over time.
-- Centroid RMSE (Hz): RMSE of spectral centroid trajectories.
-- Rolloff RMSE (Hz): RMSE of spectral rolloff trajectories.
-- Multi-resolution STFT (MR-STFT): Mean of log-magnitude L1 plus spectral convergence across several STFT configurations.
-- Log-mel L1: L1 distance between log-mel spectrograms.
-- Combined mel_mrstft: 0.5 * (log-mel L1 + MR-STFT).
+- Time MSE: Mean-squared error in time domain after RMS normalization and short-window alignment; $\mathrm{MSE}(x,y) = \tfrac{1}{N}\sum_{i=1}^{N}(x_i - y_i)^2$.
+- Cosine distance (log-magnitude STFT): Cosine distance of flattened log-magnitude STFTs; $1 - \tfrac{\langle a, b \rangle}{\|a\|\,\|b\|}$, where $a = \mathrm{vec}(\log|S|)$ and $b = \mathrm{vec}(\log|\hat S|)$.
+- Pearson distance (log-magnitude STFT): $1 - \rho(a,b)$, with $a = \mathrm{vec}(\log|S|)$ and $b = \mathrm{vec}(\log|\hat S|)$.
+- Spectral convergence: $\tfrac{\|S - \hat S\|_F}{\|S\|_F + \varepsilon}$; emphasizes relative spectral errors.
+- Log-spectral distance (dB): RMSE between $20\log_{10}|S|$ and $20\log_{10}|\hat S|$.
+- Itakura-Saito divergence (power): $D_{\mathrm{IS}}(P \Vert \hat P) = \sum\!\left(\tfrac{P}{\hat P} - \log\tfrac{P}{\hat P} - 1\right)$, with $P = |S|^2$.
+- MFCC L2: $\|M - \hat M\|_2$ for MFCC sequences (aligned to the minimum length).
+- Spectral flatness L1: Mean absolute difference of spectral flatness over time; $\tfrac{1}{T}\sum_t |\mathrm{SFM}_t - \widehat{\mathrm{SFM}}_t|$.
+- Centroid RMSE (Hz): $\sqrt{\tfrac{1}{T}\sum_t (c_t - \hat c_t)^2}$.
+- Rolloff RMSE (Hz): $\sqrt{\tfrac{1}{T}\sum_t (r_t - \hat r_t)^2}$.
+- Multi-resolution STFT (MR-STFT): Mean over several STFT configurations of $0.5\,(\text{log-mag L1} + \text{spectral convergence})$.
+- Log-mel L1: $\|\log M - \log \hat M\|_1$ between log-mel spectrograms.
+- Combined mel_mrstft: $0.5\,(\text{Log-mel L1} + \text{MR-STFT})$.
 
 Composite (if shown) is the unweighted mean of normalized metrics present.
 
