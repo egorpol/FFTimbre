@@ -4,7 +4,7 @@
 
 FFTimbre is a small toolkit of notebooks and helpers for spectral matching via FM and additive synthesis. It started as an exploratory idea inside [audiospylt](https://github.com/egorpol/audiospylt) and has since grown into its own project.
 
-Live site (audio + plots): https://egorpol.github.io/FFTimbre/
+Live site (audio + plots + evaluation): https://egorpol.github.io/FFTimbre/
 
 This work was presented at the InMusic'24 conference (Oslo). Slides are available in `inmusic24_slides/`. A paper version is planned for the InMusic'24 proceedings (Routledge).
 
