@@ -6,10 +6,7 @@
 #csvexp-{{ _id_norm }} { margin: 1rem 0; }
 #csvexp-{{ _id_norm }} .controls { display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; margin-bottom: .75rem; }
 #csvexp-{{ _id_norm }} .main-controls { display: flex; flex-direction: column; gap: .5rem; width: 240px; }
-#csvexp-{{ _id_norm }} .aux-controls { display: flex; flex-direction: row; gap: 0; width: 240px; }
-#csvexp-{{ _id_norm }} .aux-controls label { display: inline-flex; align-items: center; }
-#csvexp-{{ _id_norm }} .aux-controls input[type="checkbox"] { margin-right: .4rem; }
-#csvexp-{{ _id_norm }} .aux-controls .cb-audio { margin-left: 120px; }
+#csvexp-{{ _id_norm }} .aux-controls { display: flex; flex-direction: row; gap: 1rem; }
 #csvexp-{{ _id_norm }} label { font-size: .9rem; }
 #csvexp-{{ _id_norm }} .controls label { display: block; }
 #csvexp-{{ _id_norm }} select, #csvexp-{{ _id_norm }} input[type="text"], #csvexp-{{ _id_norm }} input[type="number"] { padding: .25rem .4rem; box-sizing: border-box; width: 100%; }
@@ -50,8 +47,8 @@
         '<label>Filter title<br><input type="text" placeholder="substring" data-role="filter"></label>' +
       '</div>' +
       '<div class="aux-controls">' +
-        '<label class="cb-norm"><input type="checkbox" data-role="norm"> Normalize [0,1]</label>' +
-        '<label class="cb-audio"><input type="checkbox" data-role="audio" checked> Show audio</label>' +
+        '<label><input type="checkbox" data-role="norm"> Normalize [0,1]</label>' +
+        '<label><input type="checkbox" data-role="audio" checked> Show audio</label>' +
       '</div>' +
     '</div>' +
     '<div class="table"></div>' +

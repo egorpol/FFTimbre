@@ -46,6 +46,7 @@ def _run_one(
     sr: int = 44100,
     duration: float = 1.0,
     fft_pad: int = 2,
+    waveform_dtype: str = "float32",
     fade_in_ms: float = 10.0,
     fade_out_ms: float = 10.0,
     bounds: Optional[Sequence[tuple[float, float]]] = None,
@@ -61,6 +62,8 @@ def _run_one(
     optimizer_kwargs = dict(optimizer_kwargs or {})
 
     # Build objective
+    np_dtype = np.float64 if str(waveform_dtype).lower() == "float64" else np.float32
+
     obj = FMObjective(
         target_freqs=target_freqs,
         target_amps=target_amps,
@@ -71,6 +74,7 @@ def _run_one(
         target_kernel="gaussian",
         target_bw_hz=2.0,
         seed=seed,
+        dtype=np_dtype,
     )
     local_bounds = list(bounds) if bounds is not None else obj.default_bounds(
         freq_lo=5.0, freq_hi=5000.0, amp_lo=0.0, amp_hi=10.0
@@ -123,7 +127,7 @@ def _run_one(
     suffix = "_".join([p for p in ("_".join(info_parts), timestamp) if p]) if info_parts else timestamp
 
     # Synthesize and save audio with a pre-suffixed filename for exact match
-    _, y = synth_chain(params, duration=duration, sr=sr)
+    _, y = synth_chain(params, duration=duration, sr=sr, dtype=np_dtype)
     # Build base prefix including target name if provided
     safe_target = str(target_name).strip() if target_name else None
     base_prefix = f"optimized_output_fm{('_' + safe_target) if safe_target else ''}"
@@ -165,7 +169,7 @@ def _run_one(
         print(f"[save_time_plot] wrote: {os.path.abspath(p_time)}")
 
         # Spectrum plot (normalized), overlay target partials
-        freqs, mag = make_fft(y, sr=sr, fft_pad=fft_pad)
+        freqs, mag = make_fft(y, sr=sr, fft_pad=fft_pad, keep_dtype=True)
         mag = mag / (np.max(mag) + 1e-12)
         plt.figure(figsize=(10, 4))
         plt.plot(freqs, mag, label="Optimized spectrum")
@@ -219,6 +223,7 @@ def run_batch_jobs(
     sr: int = 44100,
     duration: float = 1.0,
     fft_pad: int = 2,
+    waveform_dtype: str = "float32",
     fade_in_ms: float = 10.0,
     fade_out_ms: float = 10.0,
     bounds: Optional[Sequence[tuple[float, float]]] = None,
@@ -252,6 +257,7 @@ def run_batch_jobs(
             sr=sr,
             duration=duration,
             fft_pad=fft_pad,
+            waveform_dtype=waveform_dtype,
             fade_in_ms=fade_in_ms,
             fade_out_ms=fade_out_ms,
             bounds=bounds,

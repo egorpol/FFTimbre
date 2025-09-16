@@ -58,6 +58,7 @@ class RunAdditiveConfig:
     sr: int = 44100
     duration: float = 2.0
     fft_pad: int = 2
+    waveform_dtype: str = "float32"  # control synthesis dtype for waveforms/additive
     fade_in_ms: float = 10.0
     fade_out_ms: float = 10.0
 
@@ -79,6 +80,8 @@ def run_one_additive(cfg: RunAdditiveConfig) -> dict:
     Returns a dict with: method, metric, best, params, history, wav_path, tsv_path, plots.
     """
     optimizer_kwargs = dict(cfg.optimizer_kwargs or {})
+    # dtype selection (used for both objective and synthesis)
+    np_dtype = np.float64 if str(cfg.waveform_dtype).lower() == "float64" else np.float32
 
     obj = AdditiveObjective(
         target_freqs=cfg.target_freqs,
@@ -92,6 +95,7 @@ def run_one_additive(cfg: RunAdditiveConfig) -> dict:
         target_bw_hz=2.0,
         seed=cfg.seed,
         waveforms=(cfg.waveforms if cfg.use_waveforms else None),
+        dtype=np_dtype,
     )
     bounds = obj.default_bounds(freq_lo=5.0, freq_hi=5000.0, amp_lo=0.0, amp_hi=1.0)
 
@@ -136,11 +140,13 @@ def run_one_additive(cfg: RunAdditiveConfig) -> dict:
 
     # Audio
     wav_path = os.path.join(cfg.audio_dir, f"{base_prefix}_{suffix}.wav")
+
     _, y = additive_synth(
         params,
         duration=cfg.duration,
         sr=cfg.sr,
         waveforms=(cfg.waveforms if cfg.use_waveforms else None),
+        dtype=np_dtype,
     )
     save_wav(
         wav_path,
@@ -246,6 +252,7 @@ def _cli():
     parser.add_argument("--sr", type=int, default=44100)
     parser.add_argument("--duration", type=float, default=2.0)
     parser.add_argument("--fft-pad", type=int, default=2)
+    parser.add_argument("--dtype", choices=["float32", "float64"], default="float32", help="Waveform synthesis dtype")
     parser.add_argument("--fade-in-ms", type=float, default=10.0)
     parser.add_argument("--fade-out-ms", type=float, default=10.0)
     parser.add_argument("--seed", type=int, default=42)
@@ -308,6 +315,7 @@ def _cli():
         sr=args.sr,
         duration=args.duration,
         fft_pad=args.fft_pad,
+        waveform_dtype=args.dtype,
         fade_in_ms=args.fade_in_ms,
         fade_out_ms=args.fade_out_ms,
         method=args.method,
@@ -329,4 +337,3 @@ def _cli():
 
 if __name__ == "__main__":
     _cli()
-

@@ -37,6 +37,30 @@ title: Voice — "o" Vowel (single frame)
 - [Optimized FM — BH + mfcc](#optimized-fm-with-bh-mfcc)
 - [Optimized FM — BH + pearson](#optimized-fm-with-bh-pearson)
 - [Optimized FM — BH + spectral_convergence](#optimized-fm-with-bh-spectral-convergence)
+ - [Optimized Additive — DE + cosine](#optimized-additive-with-de-cosine)
+ - [Optimized Additive — DE + euclidean](#optimized-additive-with-de-euclidean)
+ - [Optimized Additive — DE + itakura_saito](#optimized-additive-with-de-itakura-saito)
+ - [Optimized Additive — DE + kl](#optimized-additive-with-de-kl)
+ - [Optimized Additive — DE + manhattan](#optimized-additive-with-de-manhattan)
+ - [Optimized Additive — DE + mfcc](#optimized-additive-with-de-mfcc)
+ - [Optimized Additive — DE + pearson](#optimized-additive-with-de-pearson)
+ - [Optimized Additive — DE + spectral_convergence](#optimized-additive-with-de-spectral-convergence)
+ - [Optimized Additive — DA + cosine](#optimized-additive-with-da-cosine)
+ - [Optimized Additive — DA + euclidean](#optimized-additive-with-da-euclidean)
+ - [Optimized Additive — DA + itakura_saito](#optimized-additive-with-da-itakura-saito)
+ - [Optimized Additive — DA + kl](#optimized-additive-with-da-kl)
+ - [Optimized Additive — DA + manhattan](#optimized-additive-with-da-manhattan)
+ - [Optimized Additive — DA + mfcc](#optimized-additive-with-da-mfcc)
+ - [Optimized Additive — DA + pearson](#optimized-additive-with-da-pearson)
+ - [Optimized Additive — DA + spectral_convergence](#optimized-additive-with-da-spectral-convergence)
+ - [Optimized Additive — BH + cosine](#optimized-additive-with-bh-cosine)
+ - [Optimized Additive — BH + euclidean](#optimized-additive-with-bh-euclidean)
+ - [Optimized Additive — BH + itakura_saito](#optimized-additive-with-bh-itakura-saito)
+ - [Optimized Additive — BH + kl](#optimized-additive-with-bh-kl)
+ - [Optimized Additive — BH + manhattan](#optimized-additive-with-bh-manhattan)
+ - [Optimized Additive — BH + mfcc](#optimized-additive-with-bh-mfcc)
+ - [Optimized Additive — BH + pearson](#optimized-additive-with-bh-pearson)
+ - [Optimized Additive — BH + spectral_convergence](#optimized-additive-with-bh-spectral-convergence)
 
 <a id="voice-fft-frame"></a>
 ## FFT Frame based on voice "o" vowel
@@ -251,5 +275,203 @@ Results below are from a batch run (`maxiter=500`) across metrics using Basin Ho
    description="FM resynthesis optimized with Basin Hopping using spectral convergence."
    audio="/rendered_audio/optimized_output_fm_voice-single2_bh_spectral_convergence_20250908-163544.wav"
    plot="/rendered_plots/optimized_output_fm_voice-single2_bh_spectral_convergence_20250908-163544_spectrum.png|/rendered_plots/optimized_output_fm_voice-single2_bh_spectral_convergence_20250908-163544_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+Results below are from a batch run (maxiter=500) across metrics using Differential Evolution.
+
+{% include sample.html 
+   title="Optimized Additive with DE + cosine"
+   description="Additive resynthesis optimized with Differential Evolution using cosine similarity."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_cosine_20250911-195212.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_cosine_20250911-195212_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_cosine_20250911-195212_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DE + euclidean"
+   description="Additive resynthesis optimized with Differential Evolution using Euclidean distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_euclidean_20250911-200540.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_euclidean_20250911-200540_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_euclidean_20250911-200540_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DE + itakura_saito"
+   description="Additive resynthesis optimized with Differential Evolution using Itakura–Saito divergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_itakura_saito_20250911-191900.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_itakura_saito_20250911-191900_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_itakura_saito_20250911-191900_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DE + kl"
+   description="Additive resynthesis optimized with Differential Evolution using KL divergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_kl_20250911-203042.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_kl_20250911-203042_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_kl_20250911-203042_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DE + manhattan"
+   description="Additive resynthesis optimized with Differential Evolution using Manhattan distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_manhattan_20250911-202457.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_manhattan_20250911-202457_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_manhattan_20250911-202457_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DE + mfcc"
+   description="Additive resynthesis optimized with Differential Evolution using MFCC distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_mfcc_20250911-184140.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_mfcc_20250911-184140_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_mfcc_20250911-184140_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DE + pearson"
+   description="Additive resynthesis optimized with Differential Evolution using Pearson correlation."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_pearson_20250911-175126.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_pearson_20250911-175126_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_pearson_20250911-175126_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DE + spectral_convergence"
+   description="Additive resynthesis optimized with Differential Evolution using spectral convergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_de_spectral_convergence_20250911-193245.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_de_spectral_convergence_20250911-193245_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_de_spectral_convergence_20250911-193245_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+Results below are from a batch run (maxiter=500) across metrics using Dual Annealing.
+
+{% include sample.html 
+   title="Optimized Additive with DA + cosine"
+   description="Additive resynthesis optimized with Dual Annealing using cosine similarity."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_cosine_20250911-195353.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_cosine_20250911-195353_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_cosine_20250911-195353_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DA + euclidean"
+   description="Additive resynthesis optimized with Dual Annealing using Euclidean distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_euclidean_20250911-200706.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_euclidean_20250911-200706_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_euclidean_20250911-200706_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DA + itakura_saito"
+   description="Additive resynthesis optimized with Dual Annealing using Itakura–Saito divergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_itakura_saito_20250911-192243.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_itakura_saito_20250911-192243_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_itakura_saito_20250911-192243_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DA + kl"
+   description="Additive resynthesis optimized with Dual Annealing using KL divergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_kl_20250911-203514.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_kl_20250911-203514_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_kl_20250911-203514_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DA + manhattan"
+   description="Additive resynthesis optimized with Dual Annealing using Manhattan distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_manhattan_20250911-202556.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_manhattan_20250911-202556_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_manhattan_20250911-202556_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DA + mfcc"
+   description="Additive resynthesis optimized with Dual Annealing using MFCC distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_mfcc_20250911-185431.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_mfcc_20250911-185431_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_mfcc_20250911-185431_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DA + pearson"
+   description="Additive resynthesis optimized with Dual Annealing using Pearson correlation."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_pearson_20250911-175737.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_pearson_20250911-175737_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_pearson_20250911-175737_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with DA + spectral_convergence"
+   description="Additive resynthesis optimized with Dual Annealing using spectral convergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_da_spectral_convergence_20250911-193429.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_da_spectral_convergence_20250911-193429_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_da_spectral_convergence_20250911-193429_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+Results below are from a batch run (maxiter=500) across metrics using Basin Hopping.
+
+{% include sample.html 
+   title="Optimized Additive with BH + cosine"
+   description="Additive resynthesis optimized with Basin Hopping using cosine similarity."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_cosine_20250911-200227.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_cosine_20250911-200227_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_cosine_20250911-200227_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with BH + euclidean"
+   description="Additive resynthesis optimized with Basin Hopping using Euclidean distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_euclidean_20250911-202234.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_euclidean_20250911-202234_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_euclidean_20250911-202234_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with BH + itakura_saito"
+   description="Additive resynthesis optimized with Basin Hopping using Itakura–Saito divergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_itakura_saito_20250911-192936.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_itakura_saito_20250911-192936_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_itakura_saito_20250911-192936_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with BH + kl"
+   description="Additive resynthesis optimized with Basin Hopping using KL divergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_kl_20250911-204513.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_kl_20250911-204513_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_kl_20250911-204513_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with BH + manhattan"
+   description="Additive resynthesis optimized with Basin Hopping using Manhattan distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_manhattan_20250911-202805.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_manhattan_20250911-202805_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_manhattan_20250911-202805_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with BH + mfcc"
+   description="Additive resynthesis optimized with Basin Hopping using MFCC distance."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_mfcc_20250911-191634.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_mfcc_20250911-191634_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_mfcc_20250911-191634_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with BH + pearson"
+   description="Additive resynthesis optimized with Basin Hopping using Pearson correlation."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_pearson_20250911-181143.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_pearson_20250911-181143_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_pearson_20250911-181143_time.png"
+   captions="Spectrogram|Waveform"
+%}
+
+{% include sample.html 
+   title="Optimized Additive with BH + spectral_convergence"
+   description="Additive resynthesis optimized with Basin Hopping using spectral convergence."
+   audio="/rendered_audio/optimized_output_additive_voice-single2_bh_spectral_convergence_20250911-194946.wav"
+   plot="/rendered_plots/optimized_output_additive_voice-single2_bh_spectral_convergence_20250911-194946_spectrum.png|/rendered_plots/optimized_output_additive_voice-single2_bh_spectral_convergence_20250911-194946_time.png"
    captions="Spectrogram|Waveform"
 %}

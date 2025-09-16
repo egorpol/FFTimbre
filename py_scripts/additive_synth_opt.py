@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Callable, Literal, Optional, Sequence, Tuple
 
 import numpy as np
+from scipy.stats import pearsonr
 
 # Reuse helpers from FM module for consistency (FFT, plotting, saving)
 from .fm_synth_opt import (
@@ -41,6 +42,7 @@ def additive_synth(
     sr: int,
     *,
     waveforms: Optional[Sequence[Callable[[float, float, float, int], np.ndarray]]] = None,
+    dtype: np.dtype = np.float32,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Additive synthesis.
 
@@ -49,8 +51,8 @@ def additive_synth(
 
     Returns (t, signal) normalized to max |x| <= 1.
     """
-    t = time_vector(duration, sr)
-    sig = np.zeros_like(t, dtype=np.float32)
+    t = time_vector(duration, sr, dtype=dtype)
+    sig = np.zeros_like(t, dtype=dtype)
     p = np.asarray(params, dtype=float)
 
     if waveforms is None:
@@ -66,16 +68,20 @@ def additive_synth(
         if a <= 0.0 or f <= 0.0:
             continue
         if waveforms is None:
-            sig += sine_wave(f, a, t)
+            sig += sine_wave(f, a, t, dtype=dtype)
         else:
             wi = _quantize_index(p[i + 2], len(waveforms))
             wav_fn = waveforms[wi]
             # waveform signature: (frequency, amplitude, duration, sample_rate)
-            sig += wav_fn(f, a, duration, sr).astype(np.float32)
+            try:
+                sig += wav_fn(f, a, duration, sr, dtype=dtype).astype(dtype)
+            except TypeError:
+                # Backward compatibility if waveform doesn't accept dtype
+                sig += wav_fn(f, a, duration, sr).astype(dtype)
     maxv = float(np.max(np.abs(sig)))
     if maxv > 0:
         sig = sig / maxv
-    return t, sig.astype(np.float32)
+    return t, sig.astype(dtype)
 
 
 def _place_kernel(
@@ -117,6 +123,7 @@ class AdditiveObjective:
     n_mfcc: int = 20
     seed: Optional[int] = 42
     waveforms: Optional[Sequence[Callable[[float, float, float, int], np.ndarray]]] = None
+    dtype: np.dtype = np.float32
 
     # caches
     _freqs: Optional[np.ndarray] = None
@@ -127,7 +134,7 @@ class AdditiveObjective:
     def __post_init__(self):
         self.target_amps = self._normalize(self.target_amps)
         t_tmp = time_vector(self.duration, self.sr)
-        freqs_tmp, _ = make_fft(np.zeros_like(t_tmp), self.sr, self.fft_pad)
+        freqs_tmp, _ = make_fft(np.zeros_like(t_tmp), self.sr, self.fft_pad, keep_dtype=True)
         self._freqs = freqs_tmp
         self._target_spec = _place_kernel(
             self.target_freqs.astype(np.float32),
@@ -135,7 +142,7 @@ class AdditiveObjective:
             self._freqs,
             kernel=self.target_kernel,
             bw_hz=self.target_bw_hz,
-        )
+        ).astype(self.dtype)
         self._t = t_tmp
 
     @staticmethod
@@ -183,9 +190,15 @@ class AdditiveObjective:
 
     def __call__(self, params: np.ndarray) -> float:
         # synthesize
-        _, sig = additive_synth(params, duration=self.duration, sr=self.sr, waveforms=self.waveforms)
+        _, sig = additive_synth(
+            params,
+            duration=self.duration,
+            sr=self.sr,
+            waveforms=self.waveforms,
+            dtype=self.dtype,
+        )
         # spectrum
-        _, mag = make_fft(sig, sr=self.sr, fft_pad=self.fft_pad)
+        _, mag = make_fft(sig, sr=self.sr, fft_pad=self.fft_pad, keep_dtype=True)
         target = self._target_spec
         eps = 1e-12
 
@@ -223,7 +236,6 @@ class AdditiveObjective:
             return float(np.sum(p * (np.log(p + eps) - np.log(q + eps))))
 
         if self.metric == "pearson":
-            from scipy.stats import pearsonr
             if float(np.std(mag)) < 1e-12 or float(np.std(target)) < 1e-12:
                 return 1.0
             r, _ = pearsonr(mag, target)

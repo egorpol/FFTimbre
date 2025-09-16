@@ -39,52 +39,80 @@ def synthesize_target_additive(freqs, amps, duration, sr, fade_in_ms=10.0, fade_
 # Synthesis helpers
 # -----------------------------------------------------------------------------
 
-def time_vector(duration: float, sr: int) -> np.ndarray:
+def time_vector(duration: float, sr: int, *, dtype: np.dtype = np.float32) -> np.ndarray:
     n = int(np.round(duration * sr))
     # endpoint=False to avoid a discontinuity at t=duration
-    return np.linspace(0.0, duration, n, endpoint=False, dtype=np.float32)
+    return np.linspace(0.0, duration, n, endpoint=False, dtype=dtype)
 
 
-def sine_wave(freq: float, amp: float, t: np.ndarray) -> np.ndarray:
-    return amp * np.sin(2.0 * np.pi * freq * t, dtype=np.float32)
+def sine_wave(freq: float, amp: float, t: np.ndarray, *, dtype: np.dtype | None = None) -> np.ndarray:
+    # Use dtype of provided time vector unless explicitly overridden
+    if dtype is None:
+        dtype = getattr(t, "dtype", np.float32)
+    return (amp * np.sin(2.0 * np.pi * freq * t, dtype=dtype)).astype(dtype)
 
 
-def fm_modulate(carrier_freq: float, carrier_amp: float, mod_signal: np.ndarray, t: np.ndarray) -> np.ndarray:
+def fm_modulate(
+    carrier_freq: float,
+    carrier_amp: float,
+    mod_signal: np.ndarray,
+    t: np.ndarray,
+    *,
+    dtype: np.dtype | None = None,
+) -> np.ndarray:
     # "amp" acts as carrier amplitude; mod_signal is *phase* in radians
-    return carrier_amp * np.sin(2.0 * np.pi * carrier_freq * t + mod_signal, dtype=np.float32)
+    if dtype is None:
+        dtype = getattr(t, "dtype", np.float32)
+    return (carrier_amp * np.sin(2.0 * np.pi * carrier_freq * t + mod_signal, dtype=dtype)).astype(dtype)
 
 
-def synth_chain(params: np.ndarray, duration: float, sr: int) -> Tuple[np.ndarray, np.ndarray]:
+def synth_chain(
+    params: np.ndarray,
+    duration: float,
+    sr: int,
+    *,
+    dtype: np.dtype = np.float32,
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     4-osc FM chain (osc4 -> osc3 -> osc2 -> osc1):
     params = [f4, a4, f3, a3, f2, a2, f1, a1]
     Returns (t, signal) normalized to max |x| <= 1.
     """
-    t = time_vector(duration, sr)
+    t = time_vector(duration, sr, dtype=dtype)
     f4, a4, f3, a3, f2, a2, f1, a1 = params
-    mod4 = sine_wave(f4, a4, t)
-    mod3 = fm_modulate(f3, a3, mod4, t)
-    mod2 = fm_modulate(f2, a2, mod3, t)
-    sig = fm_modulate(f1, a1, mod2, t)
+    mod4 = sine_wave(f4, a4, t, dtype=dtype)
+    mod3 = fm_modulate(f3, a3, mod4, t, dtype=dtype)
+    mod2 = fm_modulate(f2, a2, mod3, t, dtype=dtype)
+    sig = fm_modulate(f1, a1, mod2, t, dtype=dtype)
 
     maxv = np.max(np.abs(sig))
     if maxv > 0:
         sig = sig / maxv
-    return t, sig.astype(np.float32)
+    return t, sig.astype(dtype)
 
 # -----------------------------------------------------------------------------
 # Spectral helpers
 # -----------------------------------------------------------------------------
 
-def make_fft(signal: np.ndarray, sr: int, fft_pad: int = 1) -> Tuple[np.ndarray, np.ndarray]:
-    """Return (freqs, mag) using Hann window + rFFT with zero-padding factor fft_pad."""
+def make_fft(
+    signal: np.ndarray,
+    sr: int,
+    fft_pad: int = 1,
+    *,
+    keep_dtype: bool = False,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Return (freqs, mag) using Hann window + rFFT with zero-padding factor fft_pad.
+
+    If keep_dtype is True, magnitude array matches the dtype of ``signal``; otherwise float32.
+    """
     n = len(signal)
     n_fft = next_fast_len(n * max(1, int(fft_pad)))
     window = np.hanning(n).astype(np.float32)
     win_energy = np.sum(window**2) / n
     xw = signal[:n] * window
     spec = rfft(xw, n=n_fft)
-    mag = np.abs(spec).astype(np.float32)
+    out_dtype = signal.dtype if keep_dtype else np.float32
+    mag = np.abs(spec).astype(out_dtype)
     # Optional window normalization (so amplitude isn't arbitrarily reduced)
     if win_energy > 0:
         mag = mag / np.sqrt(win_energy)
@@ -146,6 +174,7 @@ class FMObjective:
     target_bw_hz: float = 2.0
     n_mfcc: int = 20
     seed: Optional[int] = 42
+    dtype: np.dtype = np.float32
 
     # internal caches
     _t: Optional[np.ndarray] = None
@@ -158,10 +187,10 @@ class FMObjective:
         _ = rng.random()  # touch RNG for reproducibility elsewhere if desired
         self.target_amps = self._normalize(self.target_amps)
         # prepare representations that match model FFT resolution
-        t_tmp = time_vector(self.duration, self.sr)
+        t_tmp = time_vector(self.duration, self.sr, dtype=self.dtype)
         # Use the frequency grid returned by make_fft to ensure
         # the target spectrum matches synthesized spectra length.
-        freqs_tmp, _ = make_fft(np.zeros_like(t_tmp), self.sr, self.fft_pad)
+        freqs_tmp, _ = make_fft(np.zeros_like(t_tmp), self.sr, self.fft_pad, keep_dtype=True)
         self._freqs = freqs_tmp
         self._target_spec = _place_kernel(
             self.target_freqs.astype(np.float32),
@@ -169,7 +198,7 @@ class FMObjective:
             self._freqs,
             kernel=self.target_kernel,
             bw_hz=self.target_bw_hz,
-        )
+        ).astype(self.dtype)
         # target MFCC from additive sines (optional, only computed if needed)
         self._t = t_tmp
 
@@ -186,7 +215,7 @@ class FMObjective:
     def _ensure_target_mfcc(self):
         if self._target_mfcc_mean is not None:
             return
-        t = self._t if self._t is not None else time_vector(self.duration, self.sr)
+        t = self._t if self._t is not None else time_vector(self.duration, self.sr, dtype=self.dtype)
         # build an additive target signal from partials for MFCC comparison
         target_sig = np.zeros_like(t, dtype=np.float32)
         for f, a in zip(self.target_freqs, self.target_amps):
@@ -201,9 +230,9 @@ class FMObjective:
 
     def __call__(self, params: np.ndarray) -> float:
         # synthesize
-        _, sig = synth_chain(params, duration=self.duration, sr=self.sr)
+        _, sig = synth_chain(params, duration=self.duration, sr=self.sr, dtype=self.dtype)
         # spectrum
-        freqs, mag = make_fft(sig, sr=self.sr, fft_pad=self.fft_pad)
+        freqs, mag = make_fft(sig, sr=self.sr, fft_pad=self.fft_pad, keep_dtype=True)
         # align to cached grid (should already match)
         target = self._target_spec
         eps = 1e-12

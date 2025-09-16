@@ -1,0 +1,5 @@
+Modulator	Frequency (Hz)	Amplitude	Waveform
+1	2497.16709361833	0.5221266204796765	noise_wave
+2	2516.1952242933403	1.0	sine_wave
+3	2505.272477618612	1.0	sawtooth_wave
+4	2506.639001091447	0.0	triangle_wave

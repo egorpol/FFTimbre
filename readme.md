@@ -10,7 +10,7 @@ This work was presented at the InMusic'24 conference (Oslo). Slides are availabl
 
 ## Overview
 
-The core question: how can we reproduce a target spectrum with a constrained oscillator setup? The initial motivation was to automatically derive settings for a Doepfer A‑100 modular configuration (mostly for fun), but it has evolved into a general tool for resynthesizing spectra, with export to Ableton Operator in mind.
+The core question: how can we reproduce a target spectrum with a constrained oscillator setup? The initial motivation was to automatically derive settings for a Doepfer A-100 modular configuration (mostly for fun), but it has evolved into a general tool for resynthesizing spectra, with export to Ableton Operator in mind.
 
 The approach is inspired by ideas from Risset & Wessel (1999), where a human judges the “goodness of fit” by comparing synthesized and original sounds. Here, we explore automated evaluation via spectral metrics and global optimizers.
 
@@ -20,7 +20,7 @@ The approach is inspired by ideas from Risset & Wessel (1999), where a human jud
 
 - We take a table of frequency/amplitude pairs (e.g., from [audiospylt](https://github.com/egorpol/audiospylt)) as the target.
 - We compare target and synthesized spectra using multiple similarity metrics:
-  - Itakura–Saito, Spectral Convergence, Cosine, Euclidean, Manhattan, KL, Pearson, MFCC distance.
+  - Itakura-Saito, Spectral Convergence, Cosine, Euclidean, Manhattan, KL, Pearson, MFCC distance.
 - We optimize synthesis parameters using multiple global optimizers:
   - Differential Evolution (DE), Dual Annealing (DA), Basin Hopping (BH).
 A graphical overview:
@@ -28,7 +28,7 @@ A graphical overview:
 ![Workflow schema](schema.png)
 
 After optimization we get a TSV with oscillator values. We can synthesize it in Python right away or export it as an Ableton Operator preset.
-We target two Operator setups: FM (algorithm 0 — the leftmost in the Operator GUI) and additive (algorithm 10 — the rightmost).
+We target two Operator setups: FM (algorithm 0 - the leftmost in the Operator GUI) and additive (algorithm 10 - the rightmost).
 To go from a TSV of optimized oscillator settings to the Operator preset, we adjust value formatting and write the preset data into a compressed XML file.
 
 In its current state, FFTimbre is an exploration tool that showcases various metrics and optimizers, aimed at artistic and exploratory use. Some metric/optimizer combinations can produce unexpected yet interesting results, including unconventional parameter settings. A general limitation is that it currently operates on a single DFT frame, which restricts the system to static sounds.
@@ -37,41 +37,45 @@ An improved version with additional metrics and optimizers, as well as a freely 
 
 ## Repository Structure
 
-- `inmusic24_slides/` — conference slides (PDF/PPTX)
+- `inmusic24_slides/` - conference slides (PDF/PPTX)
 - Website (GitHub Pages)
-  - `index.md` — site homepage with audio/plot gallery
-  - `_config.yml` — Jekyll site config (project page)
-  - `_includes/` — reusable HTML includes
-    - `sample.html` — audio + plot block
-    - `tsv_table.html` — dynamic TSV preview
-  - `assets/style.css` — site stylesheet
-  - `examples/` — per‑example subpages (cello/voice/Parmegiani)
+  - `index.md` - site homepage with audio/plot gallery
+  - `_config.yml` - Jekyll site config (project page)
+  - `_includes/` - reusable HTML includes
+    - `sample.html` - audio + plot block
+    - `tsv_table.html` - dynamic TSV preview
+  - `assets/style.css` - site stylesheet
+  - `examples/` - per-example subpages and evaluation explorers (cello/voice/Parmegiani)
+    - `*_eval.csv` and `*_eval.md` feed the Jekyll evaluation explorers.
 - `py_scripts/`
-  - `fm_synth_opt.py` — objective, synthesis, optimization runners, plotting, I/O helpers
-  - `optimization_workflow.py` — batch job utilities and consistent file naming
-  - `objective_functions.py` — legacy/experimental objective prototypes
-  - `generate_wave_file.py` — WAV rendering at various sample rates/bit depths
-  - `interactive_controls.py` — reusable ipywidgets UI for notebook workflows
-  - `waveform_generators.py` — basic waveform functions (sine/square/triangle/saw/noise)
-- `tsv/` — example target partials and saved final oscillator values (e.g., `cello_single.tsv`, `noanoa_single.tsv`, `final_values_fm_*.tsv`)
-- `xml_presets/` — example Operator preset files (`.adv` Ableton presets and `.xml` sources)
-- `rendered_audio/` — generated WAV files
-- `rendered_gifs/` — optimizer animations
-- `rendered_plots/` — saved PNG plots from runs
+  - `fm_synth_opt.py` - objective, synthesis, optimization runners, plotting, I/O helpers
+  - `optimization_workflow.py` - batch job utilities and consistent file naming
+  - `objective_functions.py` - legacy/experimental objective prototypes
+  - `generate_wave_file.py` - WAV rendering at various sample rates/bit depths
+  - `interactive_controls.py` - reusable ipywidgets UI for notebook workflows
+  - `waveform_generators.py` - basic waveform functions (sine/square/triangle/saw/noise)
+- `tsv/` - example target partials and saved final oscillator values (e.g., `cello_single.tsv`, `noanoa_single.tsv`, `final_values_fm_*.tsv`)
+- `xml_presets/` - example Operator preset files (`.adv` Ableton presets and `.xml` sources)
+- `rendered_audio/` - generated WAV files
+- `rendered_gifs/` - optimizer animations
+- `rendered_plots/` - saved PNG plots from runs
 
-- `risset.png`, `schema.png` — figures used in the README
+- `risset.png`, `schema.png` - figures used in the README
 
 - Notebooks
-  - `distances_demo.ipynb` — overview of objective functions on a simple spectrum
-  - `optimization_gif.ipynb` — preview of the optimization algorithm workflow
-  - `parameter_operator_fm.ipynb`, `parameter_operator_additive.ipynb` — parameter mapping
-  - `preset_editor_operator_fm.ipynb`, `preset_editor_operator_additive.ipynb` — preset export/editing
-  - `spectral_ml_additive3.ipynb` — additive synthesis experiments
-  - `spectral_ml_fm3.ipynb`, `spectral_ml_fm3_interactive.ipynb` — earlier/interactive FM experiments
-  - `spectral_ml_fm4.ipynb` — guided single‑run workflow (optimize → preview → save)
-  - `spectral_ml_fm4_batch.ipynb` — batch runner for metrics/optimizers with consistent naming
-  - `render_from_tsv_fm.ipynb` — render audio from saved TSV with optimized FM values
-  - `render_from_tsv_table.ipynb` — render audio from TSV of partials (freq/amp)
+  - `distances_demo.ipynb` - overview of objective functions on a simple spectrum
+  - `optimization_gif.ipynb` - preview of the optimization algorithm workflow
+  - `parameter_operator_fm.ipynb`, `parameter_operator_additive.ipynb` - parameter mapping
+  - `preset_editor_operator_fm.ipynb`, `preset_editor_operator_additive.ipynb` - preset export/editing
+  - `spectral_ml_additive3.ipynb` - earlier additive synthesis experiments
+  - `spectral_ml_additive4.ipynb` - latest additive single-run workflow (optimize -> preview -> save)
+  - `spectral_ml_additive4_batch.ipynb` - additive batch runner for metrics/optimizers with consistent naming
+  - `spectral_ml_fm3.ipynb`, `spectral_ml_fm3_interactive.ipynb` - earlier/interactive FM experiments
+  - `spectral_ml_fm4.ipynb` - guided single-run workflow (optimize -> preview -> save)
+  - `spectral_ml_fm4_batch.ipynb` - batch runner for metrics/optimizers with consistent naming
+  - `evaluate_cello_examples.ipynb`, `evaluate_parm_examples.ipynb`, `evaluate_voice_examples.ipynb` - generate evaluation CSVs and audio links for the site explorers
+  - `render_from_tsv_fm.ipynb` - render audio from saved TSV with optimized FM values
+  - `render_from_tsv_table.ipynb` - render audio from TSV of partials (freq/amp)
 
 ## Installation
 
@@ -89,20 +93,31 @@ pip install -r requirements.txt
 - Outputs are written to `rendered_audio/` (WAV), `rendered_plots/` (PNG), and `tsv/` (final values).
 - For multiple metrics/optimizers, try `spectral_ml_fm4_batch.ipynb`.
 
+Optimization runs are slow: a single optimization can take 20-30 minutes. Lowering `WAVEFORM_DTYPE` to `'float32'` in the notebooks trades precision for speed compared to `'float64'`, but full batch runs may still take hours on an 8 vCPU machine (only Differential Evolution benefits from multiple workers).
+
 ## GitHub Pages (Site)
 
 - **Hosting**: Built with Jekyll and published via GitHub Pages as a project site at `https://egorpol.github.io/FFTimbre/`.
 - **Config**: `/_config.yml` sets `url` and `baseurl` for project hosting.
 - **Homepage**: `/index.md` shows cello results plus links to other examples.
-- **Examples**: Per‑example subpages live in `/examples/`:
+- **Examples**: Per-example subpages live in `/examples/`:
   - `/examples/cello.md`
   - `/examples/voice-single2.md`
   - `/examples/parm.md`
+- **Evaluation explorers**: `/examples/*_eval.md` embed `csv_explorer.html` to browse the exported metric tables.
 - **Includes**: Reusable blocks in `/_includes/`:
-  - `tsv_table.html` renders TSV previews (client‑side).
-  - `sample.html` embeds audio and one or two plots side‑by‑side.
-- **Clickable plots**: All plots are clickable to open the full‑resolution image in a new tab.
-- **Anchors**: Section ids come from titles (slugified), so legend links like “Optimized FM with DE + cosine” → `#optimized-fm-with-de-cosine` work automatically.
+  - `tsv_table.html` renders TSV previews (client-side).
+  - `sample.html` embeds audio and one or two plots side-by-side.
+- **Clickable plots**: All plots are clickable to open the full-resolution image in a new tab.
+- **Anchors**: Section ids come from titles (slugified), so legend links like "Optimized FM with DE + cosine" -> `#optimized-fm-with-de-cosine` work automatically.
+
+## Evaluation Workflows
+
+Evaluation notebooks export the metric tables consumed by the GitHub Pages explorers.
+
+- `evaluate_cello_examples.ipynb`, `evaluate_parm_examples.ipynb`, `evaluate_voice_examples.ipynb` aggregate optimization runs, export `examples/*_eval.csv`, and stage audio references in `rendered_audio/`.
+- The generated CSV files pair with `examples/*_eval.md`, which wrap the `_includes/csv_explorer.html` component to produce interactive tables.
+- Each explorer surfaces normalized metrics alongside direct audio previews, mirroring the columns captured in the CSV output.
 
 ## Usage (Programmatic)
 
@@ -149,15 +164,33 @@ save_and_display_final_values(params, "tsv/final_values_fm.tsv")
 
 ## Metrics and Optimizers
 
-- **Metrics**: Itakura–Saito (`itakura_saito`), Spectral Convergence (`spectral_convergence`), Cosine (`cosine`), Euclidean (`euclidean`), Manhattan (`manhattan`), KL (`kl`), Pearson (`pearson`), MFCC (`mfcc`).
+- **Objective metrics**: Itakura-Saito (`itakura_saito`), Spectral Convergence (`spectral_convergence`), Cosine (`cosine`), Euclidean (`euclidean`), Manhattan (`manhattan`), KL (`kl`), Pearson (`pearson`), MFCC (`mfcc`).
 - **Optimizers**: Differential Evolution (DE), Dual Annealing (DA), Basin Hopping (BH).
+- **Evaluation metrics**: See [Evaluation metrics (lower is better unless noted)](#evaluation-metrics-lower-is-better-unless-noted) for the scoring criteria used outside the optimization loop.
+
+## Evaluation metrics (lower is better unless noted)
+- Time MSE: Mean-squared error in time domain after RMS normalization and short-window alignment.
+- Cosine distance (log-magnitude STFT): Cosine distance of flattened log |STFT|.
+- Pearson distance (log-magnitude STFT): 1 - Pearson correlation of flattened log |STFT|.
+- Spectral convergence: ||S - S_hat|| / (||S|| + epsilon); emphasizes relative spectral errors.
+- Log-spectral distance (dB): RMSE between amplitude-in-dB spectra; classic perceptual scale.
+- Itakura-Saito divergence (power): D_IS(S**2 || S_hat**2); scale-sensitive spectral mismatch.
+- MFCC L2: L2 distance of MFCC sequences (aligned in time to minimum length).
+- Spectral flatness L1: Mean absolute difference of spectral flatness over time.
+- Centroid RMSE (Hz): RMSE of spectral centroid trajectories.
+- Rolloff RMSE (Hz): RMSE of spectral rolloff trajectories.
+- Multi-resolution STFT (MR-STFT): Mean of log-magnitude L1 plus spectral convergence across several STFT configurations.
+- Log-mel L1: L1 distance between log-mel spectrograms.
+- Combined mel_mrstft: 0.5 * (log-mel L1 + MR-STFT).
+
+Composite (if shown) is the unweighted mean of normalized metrics present.
 
 ## Known limitations
 
-- Current FM signal path is a fixed 4‑osc chain; not all Operator routings are modeled.
+- Current FM signal path is a fixed sine 4-osc chain; not all Operator routings are modeled.
 - Preset export assumes specific Ableton Operator algorithms (FM 0, additive 10).
 - Target partial placement uses a simple kernel on the FFT grid; no phase modeling.
-- MFCC distance relies on `librosa` defaults; tuning may be task‑dependent.
+- MFCC distance relies on `librosa` defaults; tuning may be task-dependent.
 
 ## Reproducibility
 
@@ -166,7 +199,7 @@ save_and_display_final_values(params, "tsv/final_values_fm.tsv")
 
 ## References
 
-- Risset, J.-C., & Wessel, D. (1999). Exploration of timbre by analysis and synthesis. In D. Deutsch (Ed.), The psychology of music (pp. 113–169). Academic Press.
+- Risset, J.-C., & Wessel, D. (1999). Exploration of timbre by analysis and synthesis. In D. Deutsch (Ed.), The psychology of music (pp. 113-169). Academic Press.
 - SciPy optimization (`differential_evolution`, `dual_annealing`, `basinhopping`): [scipy.org](https://scipy.org)
 - Librosa features (MFCC): [librosa.org](https://librosa.org)
 
@@ -194,4 +227,4 @@ Until then, you can cite the project as:
 
 ## License
 
-MIT — see `LICENSE`.
+MIT - see `LICENSE`.
