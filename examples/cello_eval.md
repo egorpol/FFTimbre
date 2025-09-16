@@ -11,6 +11,6 @@ permalink: /examples/cello_eval.html
 
 Use the controls to sort/filter by metric and preview audio.
 
-{% include csv_explorer.html csv_path="examples/cello_eval.csv" %}
+{% include csv_explorer.html csv_path="examples/cello_eval.csv" target_audio="rendered_audio/additive_from_cello_single_2.0s_20250906-215542.wav" %}
 
 
